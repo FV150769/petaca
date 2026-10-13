@@ -55,7 +55,7 @@ function vestir(){var a=document.body.classList.contains("auth"),e=EQS[a?"":EQUI
    cr.appendChild(document.createTextNode(", por "+f.a+" ("));var l2=document.createElement("a");l2.href=f.lu;l2.target="_blank";l2.rel="noopener";l2.textContent=f.l;cr.appendChild(l2);cr.appendChild(document.createTextNode("), vía Wikimedia Commons."))}}}
 var KEY="panel-local-v1",L={events:[],expenses:[],saves:[],hidden:[],skip:[],ing:[],mv:[],inv:[],bal:{},fxAuto:true};
 try{var s=localStorage.getItem(KEY);if(s)L=JSON.parse(s);if(!L.saves)L.saves=[];if(!L.hidden)L.hidden=[];if(!L.skip)L.skip=[];if(!L.ing)L.ing=[];if(!L.bal)L.bal={};if(!L.rskip)L.rskip=[];if(!L.calno)L.calno=[];if(!L.mv)L.mv=[];if(!L.inv)L.inv=[];if(!L.fijos)L.fijos=[];if(L.fxAuto==null)L.fxAuto=true}catch(e){}
-var DOC=null,VER="v77";
+var DOC=null,VER="v78";
 var SUPABASE_URL="https://jrsjnmutdnzuxqimroaa.supabase.co";
 var SUPABASE_KEY="sb_publishable__BLdyenbNV0eqb-5MdL2Cw_48V2WwDA";
 var SB=null,UID=null;
@@ -1128,8 +1128,8 @@ async function sesionOk(){if(!SB||!UID)return false;
   r=await SB.auth.refreshSession();x=r&&r.data&&r.data.session;return!!(x&&x.user&&x.user.id===UID)}catch(e){return false}}
 var SINSES="Tu sesión se venció y no pude renovarla. Lo que cargaste quedó en este dispositivo: se sube solo cuando vuelva la conexión o cuando entres de nuevo.";
 function sinSes(){stat(SINSES);reportar("Sesión vencida: no se pudo renovar")}
-function push(){if(!HAVECFG)return Promise.resolve();var d=JSON.parse(JSON.stringify({L:L,cfg:cfgObj()}));
- return sesionOk().then(function(ok){if(!ok)throw{code:"sesion"};return SB.from("panel_state").upsert({user_id:UID,data:d,updated_at:new Date().toISOString()})}).then(function(r){if(r.error)throw r.error;sincro(d)})}
+function push(){if(!HAVECFG)return Promise.resolve();var d=JSON.parse(JSON.stringify({L:L,cfg:cfgObj(),res:resumenAtajo()}));
+ return sesionOk().then(function(ok){if(!ok)throw{code:"sesion"};return SB.from("panel_state").upsert({user_id:UID,data:d,updated_at:new Date().toISOString()})}).then(function(r){if(r.error)throw r.error;sincro(d);if(d.res)RESHOY=d.res.hoy})}
 // Cambios sin subir: cada guardado deja a este dispositivo "pendiente" (KEY-pend, con la hora del cambio) hasta que la nube lo
 // confirma, y se recuerda la última versión que coincidía con la nube (KEY-base). Si mientras tanto la cuenta cambió en otro
 // dispositivo, al volver a sincronizar se juntan las dos versiones (juntar) en vez de pisar una con la otra.
@@ -1155,7 +1155,7 @@ async function pull(){
  if(!await sesionOk()){sinSes();return}
  var r=await SB.from("panel_state").select("data").eq("user_id",UID).maybeSingle();
  if(r.error){stat("No pude leer tu nube: "+r.error.message);return}
- var q=r.data&&r.data.data;
+ var q=r.data&&r.data.data;RESHOY=q&&q.res&&q.res.hoy||"";
  if(q&&q.L){if(!HAVECFG&&q.cfg){applyCfg(q.cfg);HAVECFG=true;render()}
   // Nunca pisar datos con una copia vacía: si un lado está vacío y el otro no, gana el que tiene datos.
   // Si este dispositivo tiene cambios sin subir y la cuenta también cambió desde la última vez, se juntan las dos versiones.
@@ -1164,7 +1164,7 @@ async function pull(){
   else if(pe&&(!bs||!bs.L||(q.L.t||0)!==(bs.L.t||0))){var m=juntar(bs,{L:L,cfg:cfgObj()},q);applyCfg(m.cfg);HAVECFG=true;L=norm(m.L);save0();PREV=snap();render();await push();jn=true}
   else if((q.L.t||0)>=(L.t||0))adopt(q);else await push();SYNCED=true;stat("Sincronizado con tu nube · "+VER);
   if(jn)toast("Subí a tu cuenta lo que habías cargado en este dispositivo sin conexión, junto con lo de tus otros dispositivos.");
-  if(ONB===0)preStart();else capStart();calSync()}
+  if(ONB===0)preStart();else capStart();calSync();atajoTraer()}
  else{HAVECFG=true;ONB=0;await push();SYNCED=true;stat("Nube inicializada · "+VER);preStart()}
 }
 async function enter(session,restaurada){
@@ -2144,6 +2144,57 @@ $("tgt").onclick=async function(){var p=$("tgpm");if(!SB||!UID)return(p.textCont
  try{await push();var d=await avisosFn({prueba:true});p.textContent="Listo: mandé el aviso"+(d.telegram&&d.celulares?" por Telegram y a "+cant(d.celulares,"dispositivo","dispositivos"):d.telegram?" por Telegram":" a "+cant(d.celulares||0,"dispositivo","dispositivos"))+"."}
  catch(e){p.textContent="No pude enviarlo: "+(e&&e.message||e)}};
 $("tgo").onclick=function(){var d=$("tgd");mostrar(d);d.open=true;tgUI();d.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"})};
+
+// ===== Atajos del iPhone: Petaca desde la app Atajos o con Siri, sin abrirla (función "atajo" en Supabase) =====
+// El atajo manda lo que cargás con una clave propia; la función lo deja en una bandeja (atajo_bandeja) y la página lo suma al
+// sincronizar. Para contestar "¿cuánto me queda?" y la agenda sin abrir la app, cada vez que se sube la cuenta va también un
+// resumen (data.res). RESHOY: de qué día es el resumen que está en la nube (si es de otro día, se sube uno nuevo).
+var ATAJO_LINK=""; // link de iCloud del atajo ya armado (en Atajos: Compartir → Copiar enlace de iCloud), para instalarlo con un toque
+var RESHOY="",ATRAE=false;
+function resumenAtajo(){try{var by={},tot=0,ag={},n=14;
+ allExp(ym).forEach(function(e){tot+=e.m;by[e.c]=(by[e.c]||0)+e.m});
+ for(var i=0;i<n;i++){var f=plus(today,i),q=occs(f).slice().sort(porHora);if(q.length)ag[f]=q.slice(0,12).map(function(e){return(e.r?e.r.t+(e.r.t2?"–"+e.r.t2:""):e.t||"")+"|"+(e.r?e.r.x:e.x)})}
+ return{t:Date.now(),hoy:today,hasta:plus(today,n-1),cuenta:ACC[0][0],queda:Math.round(diaVal()),ef:Math.round(efVal()),mes:ym,gastado:Math.round(tot),
+  cats:Object.keys(BUDGET).filter(function(k){return BUDGET[k]>0&&by[k]}).map(function(k){return[k,Math.round(by[k]),BUDGET[k]]}),ag:ag}}catch(e){return null}}
+// Lo que llegó del atajo: los gastos y los ingresos entran directo (son datos exactos) y las notas van a Contale para confirmarlas.
+// Lo que se borra de la bandeja es lo que se suma: si dos dispositivos se abren a la vez, cada cosa entra en uno solo.
+async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE)return;ATRAE=true;
+ try{var r=await SB.from("atajo_bandeja").delete().gt("id",0).select("id,tipo,datos");
+  if(r.error||!r.data||!r.data.length){if(RESHOY!==today)push().catch(function(){});return}
+  var G=[],I=[],N=[],ok=/^\d{4}-\d{2}-\d{2}$/;
+  r.data.sort(function(a,b){return a.id-b.id}).forEach(function(x){var d=x.datos||{},f=ok.test(d.f)?d.f:today;
+   if(x.tipo==="gasto"&&d.m>0){var gx=String(d.x||"").trim(),c=BUDGET[d.c]!=null?d.c:gx?pCat(n2(gx)):"Otros";aprender(gx,c);G.push({f:f,m:+d.m,c:c,x:gx,me:d.me==="e"?"e":"t"})}
+   else if(x.tipo==="ingreso"&&d.v>0)I.push(d);
+   else if(x.tipo==="nota"&&d.t)N.push(String(d.t).trim())});
+  G.forEach(function(g){L.expenses.push(g)});I.forEach(function(d){sumarIng(ok.test(d.f)?d.f:today,+d.v,d.p==null?AHO:d.p,d.me)});
+  if(G.length||I.length){save();render()}
+  var q=[];if(G.length)q.push(G.length===1?"un gasto de "+money(G[0].m)+" en "+G[0].c:cant(G.length,"gasto","gastos"));if(I.length)q.push(I.length===1?"un ingreso de "+money(I[0].v):cant(I.length,"ingreso","ingresos"));
+  var msg=q.length?"Del atajo del iPhone sumé "+q.join(" y ")+".":"";
+  if(N.length){var nt=$("nt"),out=$("nr"),ocupado=busy||nt.value.trim()||out.querySelector("button");nt.value=(nt.value.trim()?nt.value.trim()+". ":"")+N.join(". ");
+   var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
+   if(!ocupado)$("nb").click();msg+=(msg?" ":"")+(N.length===1?"Te traje una nota del atajo: ":"Te traje "+N.length+" notas del atajo: ")+(ocupado?"están en Contale, tocá Entender nota.":"revisala y tocá Guardar.")}
+  if(msg)toast(msg)}
+ catch(e){reportar("Atajo: no pude traer la bandeja",e&&(e.stack||e.message))}finally{ATRAE=false}}
+async function atajoFn(body){var r=await SB.functions.invoke("atajo",{body:body});if(r.error){var t=r.error.message;try{var b=await r.error.context.json();if(b&&b.error)t=b.error}catch(e){}throw new Error(t)}return r.data||{}}
+async function atajoUI(){var m=$("atm");$("atu").value=SUPABASE_URL+"/functions/v1/atajo";
+ if(ATAJO_LINK){var l=$("atl");l.hidden=false;l.innerHTML="";var a=el("a","btnlink","📲 Instalar el atajo");a.href=ATAJO_LINK;a.target="_blank";a.rel="noopener";l.appendChild(a);l.appendChild(document.createTextNode(" Te pide la clave al instalarlo."))}
+ if(!SB||!UID){m.textContent="Iniciá sesión primero.";return}
+ m.textContent="Revisando…";try{var d=await atajoFn({accion:"estado"});
+  m.textContent=d.vinculado?"✅ Tenés una clave activa"+(d.usado?" (último uso: "+new Date(d.usado).toLocaleString("es-AR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+")":" (todavía sin usar)")+".":"Creá tu clave para conectar el atajo con tu cuenta.";
+  $("atc").textContent=d.vinculado?"Crear una clave nueva":"Crear clave";$("atx").hidden=!d.vinculado}
+ catch(e){m.textContent="No pude revisar tu clave: "+(e&&e.message||e)}}
+$("atd").addEventListener("toggle",function(){if($("atd").open)atajoUI()});
+$("atc").onclick=async function(){var m=$("atm"),b=this;if(!SB||!UID)return(m.textContent="Iniciá sesión primero.");
+ if(!$("atx").hidden&&!confirm("La clave que tenés ahora deja de andar y vas a tener que pegar la nueva en el atajo. ¿Crear una nueva?"))return;
+ b.disabled=true;m.textContent="Creando tu clave…";
+ try{var d=await atajoFn({accion:"crear"});$("atki").value=d.clave;$("atk").hidden=false;$("atx").hidden=false;b.textContent="Crear una clave nueva";
+  await push().catch(function(){});m.textContent="✅ Listo. Copiala y pegala en el atajo (Encabezados → Clave)."}
+ catch(e){m.textContent="No pude crear la clave: "+(e&&e.message||e)}finally{b.disabled=false}};
+$("atx").onclick=async function(){if(!confirm("El atajo deja de andar hasta que crees una clave nueva. ¿Desvincular?"))return;
+ try{await atajoFn({accion:"quitar"});$("atk").hidden=true;$("atki").value="";await atajoUI()}catch(e){$("atm").textContent="No pude desvincularlo: "+(e&&e.message||e)}};
+function copiar(i,b){var v=$(i).value;if(!v)return;var fin=function(){if(!b.dataset.t)b.dataset.t=b.textContent;b.textContent="✅ Copiado";clearTimeout(b._t);b._t=setTimeout(function(){b.textContent=b.dataset.t},1500)};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(fin,function(){$(i).select()});else{$(i).select();try{document.execCommand("copy");fin()}catch(e){}}}
+$("atkc").onclick=function(){copiar("atki",this)};$("atuc").onclick=function(){copiar("atu",this)};
 
 // ===== Pantalla: tema claro u oscuro (tema.js lo aplica antes de dibujar la página) =====
 function temaUI(){var t=window.petacaTemaActual?petacaTemaActual():"auto",g=$("temas");if(!g)return;g.setAttribute("data-v",t);

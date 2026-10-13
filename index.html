@@ -13,10 +13,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#12A150">
-<script src="tema.js?v=77"></script>
+<script src="tema.js?v=78"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="styles.css?v=77">
+<link rel="stylesheet" href="styles.css?v=78">
 </head>
 <body class="auth">
 <div class="cancha" aria-hidden="true"><i class="area ar"></i><i class="chica ar"></i><i class="arco ar"></i><i class="area ab"></i><i class="chica ab"></i><i class="arco ab"></i><i class="esq e1"></i><i class="esq e2"></i><i class="esq e3"></i><i class="esq e4"></i><i class="bandera b1"></i><i class="bandera b2"></i><span class="pelota">⚽</span></div>
@@ -117,6 +117,7 @@
 <p><b>El inicio</b> muestra lo de todos los días: 📋 ¿Qué tenés hoy?, ✍️ Contale a Petaca, 💸 Tu plata y 📅 Agenda (y arriba, el partido de tu equipo). Si querés profundizar, abajo están <b>📊 Más de tu plata</b> y <b>⚙️ Configuración</b>.</p>
 <p>En el celu, la <b>barra de abajo</b> te lleva a cada parte: Inicio, Plata, <b>✍️ Contale</b> (en el medio, te deja escribiendo una nota), Agenda y Más.</p>
 <p><b>Instalala en el celular:</b> en iPhone, Safari → Compartir → "Agregar a inicio". En Android, Chrome → menú ⋮ → "Instalar app".</p>
+<p><b>Con Siri y los Atajos del iPhone</b> cargás gastos, ingresos y notas, y preguntás cuánto te queda o qué tenés hoy, sin abrir Petaca: se arma en <b>⚙️ Configuración → Atajos del iPhone</b>.</p>
 <p>En <b>⚙️ Configuración → Pantalla y bloqueo</b> elegís el modo oscuro y podés pedir un PIN (o tu huella / Face ID) para abrir Petaca. Con <b>↕ Armar la formación</b> (en ⋯) ordenás las secciones a tu gusto.</p>
 <p>Todo lo que se configura está junto en <b>⚙️ Configuración</b>: los ajustes, tus calendarios, la IA de Petaca, los avisos, la pantalla y el bloqueo, tu cuenta y la copia de seguridad para exportar tus datos.</p>
 </details>
@@ -255,7 +256,7 @@
 </div>
 
 <div class="grupo menu" data-g="ajustes" data-name="Configuración">
-<h2 class="menuh"><button type="button" class="menub" aria-expanded="false" aria-controls="m-ajustes"><i aria-hidden="true">⚙️</i><span>Configuración<small>Ajustes, tus calendarios, IA de Petaca, avisos, pantalla y bloqueo, tu cuenta y copia de seguridad</small></span></button></h2>
+<h2 class="menuh"><button type="button" class="menub" aria-expanded="false" aria-controls="m-ajustes"><i aria-hidden="true">⚙️</i><span>Configuración<small>Ajustes, tus calendarios, IA de Petaca, avisos, atajos del iPhone, pantalla y bloqueo, tu cuenta y copia de seguridad</small></span></button></h2>
 <div class="cols" id="m-ajustes">
 <section class="goal" data-c="ajustes" data-name="Ajustes"><details id="aj"><summary>Ajustes</summary>
 <p class="sem" style="margin-top:0">Configurá tus categorías de gasto, tu objetivo de ahorro y tus cuentas. Se guarda en tu cuenta.</p>
@@ -336,6 +337,31 @@
 <div class="add"><button id="tgas">Guardar horarios</button></div>
 <p class="sem" id="tgam"></p>
 </details></section>
+<section class="goal" data-c="atajo" data-name="Atajos del iPhone"><details id="atd"><summary>Atajos del iPhone</summary>
+<p class="sem" style="margin-top:0">Desde la app Atajos o con Siri, sin abrir Petaca: contale algo, cargá un gasto o un ingreso, preguntá cuánto te queda o qué tenés hoy. Los gastos y los ingresos entran solos la próxima vez que abras Petaca; las notas te las muestro para que las confirmes.</p>
+<p class="sem" id="atm"></p>
+<div class="add"><button id="atc">Crear clave</button><button class="x" id="atx" hidden>Desvincular</button></div>
+<div id="atk" hidden>
+<p class="sem">Tu clave (se muestra una sola vez; no la compartas con nadie):</p>
+<div class="add"><input id="atki" readonly autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Clave del atajo"><button type="button" id="atkc">📋 Copiar</button></div>
+</div>
+<p class="sem" id="atl" hidden></p>
+<details class="calcomo"><summary>¿Cómo armo el atajo?</summary>
+<p class="sem">Se arma una sola vez, en la app <b>Atajos</b> del iPhone. Vas a necesitar esta dirección y tu clave:</p>
+<div class="add"><input id="atu" readonly autocomplete="off" spellcheck="false" aria-label="Dirección para el atajo"><button type="button" id="atuc">📋 Copiar</button></div>
+<ol class="sem tgp">
+<li>Atajos → <b>＋</b> → nombralo <b>Petaca</b> (así le decís "Oye Siri, Petaca").</li>
+<li>Agregá <b>Elegir del menú</b> con 5 opciones: <b>Contale</b>, <b>Gasto</b>, <b>Ingreso</b>, <b>¿Cuánto me queda?</b> y <b>Agenda</b>.</li>
+<li>En cada opción va un <b>Obtener contenido de URL</b> con la dirección de arriba. Tocá ▸ y poné <b>Método: POST</b>; en <b>Encabezados</b> agregá uno que se llame <b>Clave</b> con tu clave; en <b>Cuerpo de la solicitud: JSON</b>, los campos de cada opción. Armalo una vez y en las otras opciones usá <b>Duplicar</b>.</li>
+<li><b>Contale:</b> antes, <b>Dictar texto</b>. Campos: <code>accion</code> = nota, <code>texto</code> = Texto dictado.</li>
+<li><b>Gasto:</b> antes, <b>Pedir entrada</b> (Número, "¿Cuánto gastaste?"); después un <b>Obtener contenido de URL</b> con <code>accion</code> = categorias, <b>Dividir texto</b> por saltos de línea y <b>Elegir de la lista</b> ("¿En qué?"); y una <b>Lista</b> con Transferencia y Efectivo + <b>Elegir de la lista</b> ("¿Cómo pagaste?"). Campos: <code>accion</code> = gasto, <code>monto</code> = Entrada proporcionada, <code>categoria</code> = la categoría elegida, <code>medio</code> = el medio elegido. Si querés, sumá <code>detalle</code> con otro Pedir entrada (Texto).</li>
+<li><b>Ingreso:</b> <b>Pedir entrada</b> (Número, "¿Cuánto te entró?"), la Lista de medios y Elegir de la lista. Campos: <code>accion</code> = ingreso, <code>monto</code>, <code>medio</code>. Se separa tu % de ahorro de siempre (o mandá <code>ahorro</code> con otro %).</li>
+<li><b>¿Cuánto me queda?</b> y <b>Agenda:</b> solo el campo <code>accion</code> = queda o agenda.</li>
+<li>Abajo de todo, fuera del menú: <b>Mostrar resultado</b> con el <b>Resultado del menú</b>. Si lo usás con Siri, te lo lee en voz alta.</li>
+</ol>
+<p class="sem">Tip: duplicá el atajo, dejale solo Dictar texto → Obtener contenido de URL (nota) → Mostrar resultado y llamalo <b>Contale a Petaca</b>: "Oye Siri, contale a Petaca" y hablás directo.</p>
+</details>
+</details></section>
 <section class="goal" data-c="priv" data-name="Pantalla y bloqueo"><details id="prd"><summary>Pantalla y bloqueo</summary>
 <h3 class="tgh3" style="margin-top:0">Tema</h3>
 <div class="agvis temas" id="temas" role="radiogroup" aria-label="Tema de la pantalla"><button type="button" role="radio" data-t="auto" aria-checked="true">Automático</button><button type="button" role="radio" data-t="claro" aria-checked="false">Claro</button><button type="button" role="radio" data-t="oscuro" aria-checked="false">Oscuro</button></div>
@@ -372,6 +398,6 @@
 </main>
 <div id="lock" class="lock" role="dialog" aria-modal="true" aria-labelledby="lockt" hidden></div>
 <script src="vendor/supabase-2.117.1.js"></script>
-<script src="app.js?v=77"></script>
+<script src="app.js?v=78"></script>
 </body>
 </html>
