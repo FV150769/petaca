@@ -13,10 +13,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#12A150">
-<script src="tema.js?v=81"></script>
+<script src="tema.js?v=82"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="styles.css?v=81">
+<link rel="stylesheet" href="styles.css?v=82">
 </head>
 <body class="auth">
 <div class="cancha" aria-hidden="true"><i class="area ar"></i><i class="chica ar"></i><i class="arco ar"></i><i class="area ab"></i><i class="chica ab"></i><i class="arco ab"></i><i class="esq e1"></i><i class="esq e2"></i><i class="esq e3"></i><i class="esq e4"></i><i class="bandera b1"></i><i class="bandera b2"></i><span class="pelota">⚽</span></div>
@@ -25,7 +25,7 @@
 <p id="aviso" class="sem" style="color:var(--warn);font-weight:700">Cargando… Si este mensaje no desaparece, la página no pudo iniciar. Cerrala y abrila de nuevo, o copiame lo que dice acá.</p>
 <header class="top">
 <div class="marca"><img class="masc" data-pose="sentado" src="img/petaca-pateando-arg.webp?v=3" width="58" height="66" decoding="async" alt="Petaca, la mascota: un bebé rubio jugador de fútbol con la camiseta de la Selección"><div><h1>PETACA</h1>
-<p class="sub" id="fecha"></p><p class="lema">Pelota al piso y cabeza levantada.</p></div></div>
+<p class="sub" id="fecha"></p><p class="lema"><span class="solo-fut">Pelota al piso y cabeza levantada.</span><span class="solo-pro">Tus cuentas y tu agenda, en orden.</span></p></div></div>
 <div class="acciones">
 <div class="eqsel"><button type="button" class="eqchip" id="eqbtn" aria-haspopup="true" aria-expanded="false" aria-controls="eqpop">⚽ Tu equipo ▾</button>
 <div class="eqpop" id="eqpop" role="dialog" aria-label="Elegí tu equipo" hidden><b>¿De qué cuadro sos?</b><div class="eqbs" id="eqops"></div></div></div>
@@ -34,7 +34,7 @@
 <p class="sem" id="sem2"></p>
 <button type="button" role="menuitem" id="cfgb">⚙️ Configuración</button>
 <button type="button" role="menuitem" id="guib">📖 Guía de uso</button>
-<button type="button" role="menuitem" id="ord">↕ Armar la formación</button>
+<button type="button" role="menuitem" id="ord"><span class="solo-fut">↕ Armar la formación</span><span class="solo-pro">↕ Ordenar secciones</span></button>
 <button type="button" role="menuitem" id="lockb" hidden>🔒 Bloquear ahora</button>
 <button type="button" role="menuitem" id="lo">🚪 Cerrar sesión</button>
 </div></div>
@@ -43,13 +43,13 @@
 <details class="eqfix" id="eqfix" hidden><summary id="eqsum">⚽ Tu equipo</summary><div id="eqb"></div></details>
 <section id="login" style="margin-bottom:16px;display:none">
 <div class="tablero" aria-hidden="true"><span>PETACA</span><b>3</b><em>–</em><b>0</b><span>DEUDAS</span><small>90' + 5</small></div>
-<h2>¡Salí a la cancha!</h2>
+<h2><span class="solo-fut">¡Salí a la cancha!</span><span class="solo-pro">Iniciá sesión</span></h2>
 <div class="add"><input type="text" id="le" placeholder="Email o usuario" autocomplete="username" autocapitalize="none" aria-label="Email o usuario"><input type="password" id="lp" placeholder="Contraseña" autocomplete="current-password" aria-label="Contraseña"></div>
-<div class="add"><button id="lg">Entrar</button><button id="lr" title="Crear una cuenta nueva">Ficharme</button><button class="lk" id="lf">Me olvidé la contraseña</button></div>
+<div class="add"><button id="lg">Entrar</button><button id="lr" title="Crear una cuenta nueva"><span class="solo-fut">Ficharme</span><span class="solo-pro">Crear cuenta</span></button><button class="lk" id="lf">Me olvidé la contraseña</button></div>
 <p class="sem" id="lm"></p>
 </section>
 <section id="rec" style="margin-bottom:16px;display:none"><h2>Elegí una contraseña nueva</h2><div class="add"><input type="password" id="rp" placeholder="Contraseña nueva (mínimo 8)" autocomplete="new-password" aria-label="Contraseña nueva"><button id="rpb">Guardar contraseña</button></div><p class="sem" id="rpm"></p></section>
-<div id="ordtop" style="display:none"><span>Armá tu formación: arrastrá cada grupo o tarjeta desde su barra ⠿</span><span><button class="x" id="ordr">Restablecer</button> <button id="ordok">¡Listo!</button></span></div>
+<div id="ordtop" style="display:none"><span><span class="solo-fut">Armá tu formación</span><span class="solo-pro">Ordená las secciones</span>: arrastrá cada grupo o tarjeta desde su barra ⠿</span><span><button class="x" id="ordr">Restablecer</button> <button id="ordok">¡Listo!</button></span></div>
 
 <div id="hoy" style="display:none"></div>
 <section class="guia" id="guias" hidden><details id="guia"><summary>📖 Guía de uso: cómo sacarle jugo a Petaca</summary>
@@ -60,13 +60,14 @@
 <li><b>Separá el ahorro apenas cobrás,</b> no lo que sobre a fin de mes. Petaca te pregunta cuánto separar de cada ingreso.</li>
 <li><b>Fijate siempre si fue 🏦 transferencia o 💵 efectivo,</b> y cargá cuando sacás del cajero. Así sabés dónde está tu plata.</li>
 <li><b>Cargá tus gastos fijos una vez</b> (alquiler, expensas, suscripciones): Petaca te los recuerda cada mes y los cargás con un toque.</li>
-<li><b>Mirá la charla técnica una vez por semana</b> y ponele fecha a tu objetivo: Petaca te dice cuánto ahorrar por mes.</li>
+<li><b>Mirá <span class="solo-fut">la charla técnica</span><span class="solo-pro">los consejos</span> una vez por semana</b> y ponele fecha a tu objetivo: Petaca te dice cuánto ahorrar por mes.</li>
 </ol>
 </div>
 <details class="gtema"><summary>1. Primeros pasos</summary>
-<p>Lo primero es contarle a Petaca <b>con cuánta plata arrancás</b> (tu capital inicial), cuánto de eso está en efectivo y, si tenés, <b>cuánto tenés ahorrado e invertido</b>. Se carga <b>una sola vez</b>, en la pretemporada o cuando Petaca te lo pregunta: después sigue con tu día a día. Si el saldo no coincide con tu banco, corregilo con ✎ en Cuentas.</p>
+<p>Lo primero es contarle a Petaca <b>con cuánta plata arrancás</b> (tu capital inicial), cuánto de eso está en efectivo y, si tenés, <b>cuánto tenés ahorrado e invertido</b>. Se carga <b>una sola vez</b>, en <span class="solo-fut">la pretemporada</span><span class="solo-pro">la bienvenida</span> o cuando Petaca te lo pregunta: después sigue con tu día a día. Si el saldo no coincide con tu banco, corregilo con ✎ en Cuentas.</p>
 <p>En Ajustes también elegís tus <b>categorías de gasto</b> con un presupuesto por mes, el <b>% que querés separar</b> de cada ingreso para ahorrar y tu <b>objetivo de ahorro</b>.</p>
-<p>Arriba a la derecha, en <b>⚽ Tu equipo</b>, elegís tu cuadro: Petaca se pone su camiseta, el panel toma sus colores y ves el próximo partido. Al lado, en <b>⋯</b>, están la Configuración, esta guía y Cerrar sesión.</p>
+<p class="solo-fut">Arriba a la derecha, en <b>⚽ Tu equipo</b>, elegís tu cuadro: Petaca se pone su camiseta, el panel toma sus colores y ves el próximo partido. Al lado, en <b>⋯</b>, están la Configuración, esta guía y Cerrar sesión.</p>
+<p class="solo-pro">Arriba a la derecha, en <b>⋯</b>, están la Configuración, esta guía y Cerrar sesión.</p>
 <p>En <b>⚙️ Configuración → Tu cuenta</b> podés elegir un <b>usuario</b> para entrar sin escribir el mail.</p>
 </details>
 <details class="gtema"><summary>2. Cargar ingresos y gastos</summary>
@@ -108,18 +109,19 @@
 <p><b>↶ Deshacer</b> vuelve atrás el último cambio (podés tocarlo varias veces).</p>
 <p>En <b>Movimientos cargados</b> (con buscador) y en las listas, ✎ corrige y × borra. También podés decírselo a Petaca: "me equivoqué, era en efectivo".</p>
 </details>
-<details class="gtema"><summary>8. Resumen y charla técnica</summary>
+<details class="gtema"><summary><span class="solo-fut">8. Resumen y charla técnica</span><span class="solo-pro">8. Resumen y consejos</span></summary>
 <p>El <b>Resumen</b> (en 📊 Más de tu plata) muestra cuánto tenés hoy, cuánto entró y gastaste en total, tu ahorro y dónde más gastás. En el <b>Histórico</b> ves cuánto gastaste en cada uno de los últimos meses.</p>
-<p>La <b>charla técnica</b> te da consejos: 🟥 <b>Tarjeta roja</b> es urgente, 🟨 <b>Amarilla</b> es para prestar atención, <b>Del DT</b> es una sugerencia y <b>¡Golazo!</b> es que vas bien.</p>
+<p class="solo-fut">La <b>charla técnica</b> te da consejos: 🟥 <b>Tarjeta roja</b> es urgente, 🟨 <b>Amarilla</b> es para prestar atención, <b>Del DT</b> es una sugerencia y <b>¡Golazo!</b> es que vas bien.</p>
+<p class="solo-pro">Los <b>consejos</b> van de lo más urgente a lo que va bien: <b>Urgente</b>, <b>Atención</b>, <b>Sugerencia</b> y <b>Vas bien</b>.</p>
 </details>
 <details class="gtema"><summary>9. Tu cuenta, el celular y tus datos</summary>
 <p>Todo se guarda en tu cuenta: entrás desde el celu o la compu y ves lo mismo. Sin conexión también anda: lo que cargues se sube solo cuando vuelve internet.</p>
-<p><b>El inicio</b> muestra lo de todos los días: 📋 ¿Qué tenés hoy?, ✍️ Contale a Petaca, 💸 Tu plata y 📅 Agenda (y arriba, el partido de tu equipo). Si querés profundizar, abajo están <b>📊 Más de tu plata</b> y <b>⚙️ Configuración</b>.</p>
+<p><b>El inicio</b> muestra lo de todos los días: 📋 ¿Qué tenés hoy?, ✍️ Contale a Petaca, 💸 Tu plata y 📅 Agenda<span class="solo-fut"> (y arriba, el partido de tu equipo)</span>. Si querés profundizar, abajo están <b>📊 Más de tu plata</b> y <b>⚙️ Configuración</b>.</p>
 <p>En el celu, la <b>barra de abajo</b> te lleva a cada parte: Inicio, Plata, <b>✍️ Contale</b> (en el medio, te deja escribiendo una nota), Agenda y Más.</p>
 <p><b>Instalala en el celular:</b> en iPhone, Safari → Compartir → "Agregar a inicio". En Android, Chrome → menú ⋮ → "Instalar app".</p>
 <p><b>Con Siri y los Atajos del iPhone</b> cargás gastos, ingresos y notas, y preguntás cuánto te queda o qué tenés hoy, sin abrir Petaca: se arma en <b>⚙️ Configuración → Atajos del iPhone</b>.</p>
-<p>En <b>⚙️ Configuración → Pantalla y bloqueo</b> elegís el modo oscuro y podés pedir un PIN (o tu huella / Face ID) para abrir Petaca. Con <b>↕ Armar la formación</b> (en ⋯) ordenás las secciones a tu gusto.</p>
-<p>Todo lo que se configura está junto en <b>⚙️ Configuración</b>: los ajustes, tus calendarios, la IA de Petaca, los avisos, la pantalla y el bloqueo, tu cuenta y la copia de seguridad para exportar tus datos.</p>
+<p>En <b>⚙️ Configuración → Estilo, pantalla y bloqueo</b> elegís el estilo (<b>futbolero</b> o <b>profesional</b>, sin la temática de fútbol), el modo oscuro y podés pedir un PIN (o tu huella / Face ID) para abrir Petaca. Con <b>↕ <span class="solo-fut">Armar la formación</span><span class="solo-pro">Ordenar secciones</span></b> (en ⋯) ordenás las secciones a tu gusto.</p>
+<p>Todo lo que se configura está junto en <b>⚙️ Configuración</b>: los ajustes, tus calendarios, la IA de Petaca, los avisos, el estilo, la pantalla y el bloqueo, tu cuenta y la copia de seguridad para exportar tus datos.</p>
 </details>
 <label class="sem hintsw"><input type="checkbox" id="hintsw" checked> Mostrar las recomendaciones 💡 en cada sección</label>
 </details></section>
@@ -194,7 +196,7 @@
 <section data-c="resumen" data-name="Resumen y consejos">
 <h2>Resumen</h2>
 <div id="res" class="kpis"></div>
-<h3 class="tgh3 charla"><img data-pose="enojado" src="img/petaca-enojado-arg.webp?v=3" width="264" height="479" loading="lazy" decoding="async" alt="">La charla técnica de Petaca</h3>
+<h3 class="tgh3 charla"><img data-pose="enojado" src="img/petaca-enojado-arg.webp?v=3" width="264" height="479" loading="lazy" decoding="async" alt=""><span class="solo-fut">La charla técnica de Petaca</span><span class="solo-pro">Consejos</span></h3>
 <div id="tips"></div>
 </section>
 <section data-c="gastos" data-name="Gastos del mes">
@@ -219,7 +221,7 @@
 <p class="hint">💡 Anotá también los gastos chicos (un café, el kiosco): son los que más se escapan sin que te des cuenta.</p>
 </section>
 <section class="goal" data-c="objetivo" data-name="Objetivo de ahorro">
-<h2>⚽ <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5 A7.5 7.5 0 1 1 3.2 6.8"/></svg>Objetivo de ahorro</h2>
+<h2><span class="solo-fut">⚽</span> <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 2.5 A7.5 7.5 0 1 1 3.2 6.8"/></svg>Objetivo de ahorro</h2>
 <div id="metas"></div>
 <div class="add">
 <input type="number" id="am" placeholder="Monto (USD)" inputmode="decimal" aria-label="Monto a sumar">
@@ -256,7 +258,7 @@
 </div>
 
 <div class="grupo menu" data-g="ajustes" data-name="Configuración">
-<h2 class="menuh"><button type="button" class="menub" aria-expanded="false" aria-controls="m-ajustes"><i aria-hidden="true">⚙️</i><span>Configuración<small>Ajustes, tus calendarios, IA de Petaca, avisos, atajos del iPhone, pantalla y bloqueo, tu cuenta y copia de seguridad</small></span></button></h2>
+<h2 class="menuh"><button type="button" class="menub" aria-expanded="false" aria-controls="m-ajustes"><i aria-hidden="true">⚙️</i><span>Configuración<small>Ajustes, tus calendarios, IA de Petaca, avisos, atajos del iPhone, estilo, pantalla y bloqueo, tu cuenta y copia de seguridad</small></span></button></h2>
 <div class="cols" id="m-ajustes">
 <section class="goal" data-c="ajustes" data-name="Ajustes"><details id="aj"><summary>Ajustes</summary>
 <p class="sem" style="margin-top:0">Configurá tus categorías de gasto, tu objetivo de ahorro y tus cuentas. Se guarda en tu cuenta.</p>
@@ -406,8 +408,11 @@
 </ul>
 </details>
 </details></section>
-<section class="goal" data-c="priv" data-name="Pantalla y bloqueo"><details id="prd"><summary>Pantalla y bloqueo</summary>
-<h3 class="tgh3" style="margin-top:0">Tema</h3>
+<section class="goal" data-c="priv" data-name="Estilo, pantalla y bloqueo"><details id="prd"><summary>Estilo, pantalla y bloqueo</summary>
+<h3 class="tgh3" style="margin-top:0">Estilo</h3>
+<div class="agvis temas" id="estilos" role="radiogroup" aria-label="Estilo de Petaca"><button type="button" role="radio" data-e="fut" aria-checked="true">⚽ Futbolero</button><button type="button" role="radio" data-e="pro" aria-checked="false">💼 Profesional</button></div>
+<p class="sem">Profesional: un diseño sobrio, sin la temática de fútbol, la mascota ni el fixture de tu equipo. Se guarda en tu cuenta, así lo ves igual en todos tus dispositivos.</p>
+<h3 class="tgh3">Tema</h3>
 <div class="agvis temas" id="temas" role="radiogroup" aria-label="Tema de la pantalla"><button type="button" role="radio" data-t="auto" aria-checked="true">Automático</button><button type="button" role="radio" data-t="claro" aria-checked="false">Claro</button><button type="button" role="radio" data-t="oscuro" aria-checked="false">Oscuro</button></div>
 <p class="sem">Automático sigue lo que tengas elegido en el celular o la compu. Se recuerda en este dispositivo.</p>
 <h3 class="tgh3">Bloqueo</h3>
@@ -431,7 +436,7 @@
 <p class="sem" id="est"></p>
 <p class="credito" id="credito" style="display:none"></p>
 <nav class="tabs" id="tabs" aria-label="Ir a una parte del panel">
-<button type="button" data-g="inicio"><i aria-hidden="true">🏟️</i>Inicio</button>
+<button type="button" data-g="inicio"><i aria-hidden="true"><span class="solo-fut">🏟️</span><span class="solo-pro">🏠</span></i>Inicio</button>
 <button type="button" data-g="plata"><i aria-hidden="true">💸</i>Plata</button>
 <button type="button" data-g="nota" class="tabnota"><i aria-hidden="true">✍️</i>Contale</button>
 <button type="button" data-g="fechas"><i aria-hidden="true">📅</i>Agenda</button>
@@ -442,6 +447,6 @@
 </main>
 <div id="lock" class="lock" role="dialog" aria-modal="true" aria-labelledby="lockt" hidden></div>
 <script src="vendor/supabase-2.117.1.js"></script>
-<script src="app.js?v=81"></script>
+<script src="app.js?v=82"></script>
 </body>
 </html>

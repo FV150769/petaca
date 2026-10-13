@@ -36,18 +36,24 @@ var EQUIPO="",EQS={"":{n:"Sin equipo (albiceleste)",tc:"#12A150",d:"la camiseta 
 var LIGAS={"arg.1":"Liga Profesional","arg.2":"Primera Nacional"};
 function eqDe(k){return k&&EQS[k]?k:""}
 function pose(p,k){return"img/petaca-"+p+"-"+(k&&EQS[k]?k:"arg")+".webp?v=3"}
+// Estilo profesional (html.pro, lo pone tema.js): sin la temática de fútbol, la mascota ni el fixture. Lo visual está en
+// styles.css (html.pro) y los textos del HTML tienen las dos versiones (.solo-fut y .solo-pro). F(futbolero, profesional)
+// elige el texto en lo que arma app.js.
+function esPro(){return document.documentElement.classList.contains("pro")}
+function F(a,b){return esPro()?b:a}
 Object.keys(EQS).forEach(function(k){EQS[k].img=pose("sentado",k)});
 var PRECARGA={};
-function vestir(){var a=document.body.classList.contains("auth"),e=EQS[a?"":EQUIPO]||EQS[""];
- Object.keys(EQS).forEach(function(k){if(k)document.body.classList.toggle("eq-"+k,!a&&k===EQUIPO)});
+function vestir(){var a=document.body.classList.contains("auth"),p=esPro(),e=EQS[a||p?"":EQUIPO]||EQS[""];
+ // En el estilo profesional no hay colores de equipo, foto del estadio ni partido: el equipo queda guardado para cuando vuelvas.
+ Object.keys(EQS).forEach(function(k){if(k)document.body.classList.toggle("eq-"+k,!a&&!p&&k===EQUIPO)});
  // Cada imagen con data-pose se viste con la camiseta del equipo. En la entrada, Petaca aparece pateando.
  var kit=a?"":EQUIPO;
  document.querySelectorAll("img[data-pose]").forEach(function(i){if(i.dataset.egg)return;var u=pose(a&&i.classList.contains("masc")?"pateando":i.dataset.pose,kit);if(i.getAttribute("src")!==u)i.src=u;
   if(i.classList.contains("masc"))i.alt="Petaca, la mascota: un bebé rubio jugador de fútbol con "+e.d});
  // Las poses del berrinche, listas para que el cambio sea instantáneo
  ["enojado","pateando"].forEach(function(p){var u=pose(p,kit);if(!PRECARGA[u]){PRECARGA[u]=new Image();PRECARGA[u].src=u}});
- var tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=a?"#12A150":document.documentElement.classList.contains("oscuro")?"#0B1322":e.tc;
- var ek=a?"":EQUIPO;if(ek!==EQLAST){EQLAST=ek;renderEquipo()}
+ var os=document.documentElement.classList.contains("oscuro"),tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=p?(os?"#0F1218":"#F4F6F9"):a?"#12A150":os?"#0B1322":e.tc;
+ var ek=a||p?"":EQUIPO;if(ek!==EQLAST){EQLAST=ek;renderEquipo()}
  var eb=document.getElementById("eqbtn");if(eb)eb.textContent="⚽ "+(EQUIPO?EQS[EQUIPO].n:"Tu equipo")+" ▾"
  // Crédito de la foto de fondo (la licencia pide autor, fuente y licencia)
  var cr=document.getElementById("credito");if(cr){var f=!a&&e.foto;cr.innerHTML="";cr.style.display=f?"":"none";
@@ -55,7 +61,7 @@ function vestir(){var a=document.body.classList.contains("auth"),e=EQS[a?"":EQUI
    cr.appendChild(document.createTextNode(", por "+f.a+" ("));var l2=document.createElement("a");l2.href=f.lu;l2.target="_blank";l2.rel="noopener";l2.textContent=f.l;cr.appendChild(l2);cr.appendChild(document.createTextNode("), vía Wikimedia Commons."))}}}
 var KEY="panel-local-v1",L={events:[],expenses:[],saves:[],hidden:[],skip:[],ing:[],mv:[],inv:[],bal:{},fxAuto:true};
 try{var s=localStorage.getItem(KEY);if(s)L=JSON.parse(s);if(!L.saves)L.saves=[];if(!L.hidden)L.hidden=[];if(!L.skip)L.skip=[];if(!L.ing)L.ing=[];if(!L.bal)L.bal={};if(!L.rskip)L.rskip=[];if(!L.calno)L.calno=[];if(!L.mv)L.mv=[];if(!L.inv)L.inv=[];if(!L.fijos)L.fijos=[];if(L.fxAuto==null)L.fxAuto=true}catch(e){}
-var DOC=null,VER="v81";
+var DOC=null,VER="v82";
 var SUPABASE_URL="https://jrsjnmutdnzuxqimroaa.supabase.co";
 var SUPABASE_KEY="sb_publishable__BLdyenbNV0eqb-5MdL2Cw_48V2WwDA";
 var SB=null,UID=null;
@@ -392,7 +398,7 @@ function renderResumen(){
  var r30=sumM(gs.filter(function(e){return e.f>plus(today,-30)&&e.f<=today}))/Math.min(30,Math.max(dias,1));
  function tip(n,t,x){Q.push([n,t,x])}
  function kpi(l,v,sub,c){var k=el("div","kpi"+(c?" "+c:""));k.appendChild(el("small","",l));k.appendChild(el("b","",v));if(sub)k.appendChild(el("span","",sub));R.appendChild(k)}
- function pinta(){var O={mal:0,ojo:1,tip:2,bien:3},N={mal:"Tarjeta roja",ojo:"Amarilla",tip:"Del DT",bien:"¡Golazo!"};
+ function pinta(){var O={mal:0,ojo:1,tip:2,bien:3},N=esPro()?{mal:"Urgente",ojo:"Atención",tip:"Sugerencia",bien:"Vas bien"}:{mal:"Tarjeta roja",ojo:"Amarilla",tip:"Del DT",bien:"¡Golazo!"};
   Q.sort(function(a,b){return O[a[0]]-O[b[0]]}).slice(0,5).forEach(function(q){var r=el("div","tip "+q[0]);r.appendChild(el("i"));var t=el("span");t.appendChild(el("small","tipk",N[q[0]]));t.appendChild(el("b","",q[1]+" "));t.appendChild(document.createTextNode(q[2]));r.appendChild(t);T.appendChild(r)})}
  // Lo que hay que cargar para que los números cierren
  if(capFalta())tip("ojo","Falta tu capital inicial.","Cargá en Configuración → Ajustes cuánta plata tenías al empezar. Sin eso, Petaca solo cuenta lo que fuiste cargando.");
@@ -1120,8 +1126,8 @@ function aplicarAjustes(AJC,AJP,AJO){if(!AJC.length&&!AJP.length&&!AJO.length)re
  catOpts();
  HAVECFG=true;if($("aj")&&$("aj").open)ajForm()}
 function obj0(x){return x&&typeof x==="object"&&!Array.isArray(x)?x:{}}
-function cfgObj(){return{EQUIPO:EQUIPO,ONB:ONB,CAP:CAP,PAT:PAT,CALS:CALS,AHO:AHO,LAYOUT:LAYOUT,TG:TG,TGCHAT:TGCHAT,TGAV:TGAV,ACC:ACC,USD:USD,BUDGET:BUDGET,CLASES:CLASES,RUT:RUT,FIN:FIN,SKIP:SKIP,FECHAS:FECHAS,GOAL:GOAL,HIST:HIST,APPTOT:APPTOT,PAL:PAL,PALM:PALM,EVH:EVH,MONH:MONH,FRA:FRA,FIJOS:FIJOS,PUSH:PUSH}}
-function applyCfg(c){if(!c)return;EQUIPO=eqDe(c.EQUIPO);vestir();ONB=c.ONB===0?0:1;CAP=c.CAP?1:0;PAT=c.PAT?1:0;CALS=c.CALS||[];PAL=obj0(c.PAL);PALM=obj0(c.PALM);EVH=obj0(c.EVH);MONH=obj0(c.MONH);FRA=obj0(c.FRA);AHO=c.AHO>=0?c.AHO:10;LAYOUT=c.LAYOUT||null;applyLayout();TGCHAT=c.TGCHAT||"";TG=!!TGCHAT;TGAV=c.TGAV||{d:[7,1],h:"09:00",hs:0};FIJOS=Array.isArray(c.FIJOS)?c.FIJOS:[];PUSH=c.PUSH?1:0;// campanas y avisos solo si la cuenta tiene Telegram o un celular con avisos
+function cfgObj(){return{EQUIPO:EQUIPO,ESTILO:esPro()?"pro":"fut",ONB:ONB,CAP:CAP,PAT:PAT,CALS:CALS,AHO:AHO,LAYOUT:LAYOUT,TG:TG,TGCHAT:TGCHAT,TGAV:TGAV,ACC:ACC,USD:USD,BUDGET:BUDGET,CLASES:CLASES,RUT:RUT,FIN:FIN,SKIP:SKIP,FECHAS:FECHAS,GOAL:GOAL,HIST:HIST,APPTOT:APPTOT,PAL:PAL,PALM:PALM,EVH:EVH,MONH:MONH,FRA:FRA,FIJOS:FIJOS,PUSH:PUSH}}
+function applyCfg(c){if(!c)return;EQUIPO=eqDe(c.EQUIPO);if(c.ESTILO==="pro"||c.ESTILO==="fut")estiloSet(c.ESTILO);vestir();ONB=c.ONB===0?0:1;CAP=c.CAP?1:0;PAT=c.PAT?1:0;CALS=c.CALS||[];PAL=obj0(c.PAL);PALM=obj0(c.PALM);EVH=obj0(c.EVH);MONH=obj0(c.MONH);FRA=obj0(c.FRA);AHO=c.AHO>=0?c.AHO:10;LAYOUT=c.LAYOUT||null;applyLayout();TGCHAT=c.TGCHAT||"";TG=!!TGCHAT;TGAV=c.TGAV||{d:[7,1],h:"09:00",hs:0};FIJOS=Array.isArray(c.FIJOS)?c.FIJOS:[];PUSH=c.PUSH?1:0;// campanas y avisos solo si la cuenta tiene Telegram o un celular con avisos
 if(c.ACC)ACC=c.ACC;if(c.USD)USD=c.USD;if(c.BUDGET)BUDGET=c.BUDGET;if(c.CLASES)CLASES=c.CLASES;if(c.RUT)RUT=c.RUT;if(c.FIN)FIN=c.FIN;if(c.SKIP)SKIP=c.SKIP;if(c.FECHAS)FECHAS=c.FECHAS;if(c.GOAL)GOAL=c.GOAL;if(c.HIST)HIST=c.HIST;if(c.APPTOT)APPTOT=c.APPTOT;migrate();
  catOpts()}
 $("bx").onclick=function(){$("bk").value=JSON.stringify({v:1,L:L,cfg:cfgObj()});$("bm").textContent="Copiá todo el texto y guardalo en un lugar seguro."};
@@ -1206,7 +1212,7 @@ var SALIR=false,DUENO=null;
 document.getElementById("un").onclick=function(){if(!UNDO.length)return;var q=JSON.parse(UNDO.pop());applyCfg(q.cfg);L=norm(q.L);save0();PREV=snap();render();updUndo();var o=document.getElementById("nr");if(o)o.textContent="Deshice el último cambio."};
 function authMsg(t){$("lm").textContent=t}
 // Con email se entra directo. Con usuario lo hace la función "entrar" en el servidor: el email de nadie llega a la página.
-function authError(m){m=String(m||"");return/invalid login credentials/i.test(m)?"Email o contraseña incorrectos.":/email not confirmed/i.test(m)?"Confirmá tu email: te mandamos un mail cuando te fichaste. Revisá también spam.":/rate limit|too many/i.test(m)?"Demasiados intentos. Probá de nuevo en unos minutos.":m}
+function authError(m){m=String(m||"");return/invalid login credentials/i.test(m)?"Email o contraseña incorrectos.":/email not confirmed/i.test(m)?"Confirmá tu email: te mandamos un mail cuando "+F("te fichaste","creaste tu cuenta")+". Revisá también spam.":/rate limit|too many/i.test(m)?"Demasiados intentos. Probá de nuevo en unos minutos.":m}
 $("lg").onclick=async function(){if(!SB)return authMsg("Falta configurar Supabase.");var em=$("le").value.trim(),pw=$("lp").value;if(!em)return authMsg("Escribí tu email o tu usuario.");if(pw.length<6)return authMsg("La contraseña tiene que tener al menos 6 caracteres.");
  var b=$("lg");b.disabled=true;authMsg("Entrando…");
  try{if(em.indexOf("@")>0){var r=await SB.auth.signInWithPassword({email:em,password:pw});authMsg(r.error?"No pude entrar: "+authError(r.error.message):"");return}
@@ -1214,9 +1220,9 @@ $("lg").onclick=async function(){if(!SB)return authMsg("Falta configurar Supabas
   if(q.error){var t=q.error.message;try{var j=await q.error.context.json();if(j&&j.error)t=j.error}catch(e){}return authMsg(t)}
   var s2=await SB.auth.setSession({access_token:q.data.access_token,refresh_token:q.data.refresh_token});authMsg(s2.error?"No pude entrar: "+authError(s2.error.message):"")}
  catch(e){authMsg("No pude entrar: "+(e&&e.message||e))}finally{b.disabled=false}};
-$("lr").onclick=async function(){if(!SB)return authMsg("Falta configurar Supabase.");var em=$("le").value.trim(),pw=$("lp").value;if(!em||em.indexOf("@")<1)return authMsg("Escribí tu email en el campo Email.");if(pw.length<8)return authMsg("Para ficharte, la contraseña tiene que tener al menos 8 caracteres.");var r=await SB.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});
- if(r.error)return authMsg(/rate limit/i.test(r.error.message)?"Hay muchos fichajes en este momento y no pude mandarte el mail. Probá de nuevo en un rato.":/already registered/i.test(r.error.message)?"Ese email ya tiene cuenta: tocá Entrar.":"No pude crear la cuenta: "+r.error.message);
- authMsg(r.data&&r.data.session?"¡Fichaje confirmado! Entrando a la cancha…":"¡Fichaje confirmado! Te mandamos un mail para confirmar tu cuenta: abrilo y después tocá Entrar. Revisá también spam.")};
+$("lr").onclick=async function(){if(!SB)return authMsg("Falta configurar Supabase.");var em=$("le").value.trim(),pw=$("lp").value;if(!em||em.indexOf("@")<1)return authMsg("Escribí tu email en el campo Email.");if(pw.length<8)return authMsg("Para "+F("ficharte","crear tu cuenta")+", la contraseña tiene que tener al menos 8 caracteres.");var r=await SB.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});
+ if(r.error)return authMsg(/rate limit/i.test(r.error.message)?"Hay "+F("muchos fichajes","muchas cuentas nuevas")+" en este momento y no pude mandarte el mail. Probá de nuevo en un rato.":/already registered/i.test(r.error.message)?"Ese email ya tiene cuenta: tocá Entrar.":"No pude crear la cuenta: "+r.error.message);
+ authMsg(r.data&&r.data.session?F("¡Fichaje confirmado! Entrando a la cancha…","¡Cuenta creada! Entrando…"):F("¡Fichaje confirmado!","¡Cuenta creada!")+" Te mandamos un mail para confirmar tu cuenta: abrilo y después tocá Entrar. Revisá también spam.")};
 // Cerrar sesión: primero se intenta subir lo pendiente; si no se puede (sin conexión), se avisa antes de salir.
 // Los avisos de este dispositivo y el PIN se apagan (el próximo que entre acá puede ser otra persona).
 $("lo").onclick=async function(){if(!SB)return;
@@ -1331,7 +1337,8 @@ $("ord").onclick=function(){ordUI(!document.body.classList.contains("ordenando")
 $("ordok").onclick=function(){ordUI(false)};
 $("ordr").onclick=function(){LAYOUT=null;applyLayout();HAVECFG=true;save();ordUI(true)};
 // Datos locales por usuario: la copia del navegador se borra al cerrar sesión o si entra otra cuenta, para no mezclar datos.
-var DEFCFG=JSON.stringify(cfgObj());
+// Sin el estilo: al cerrar sesión, el dispositivo sigue con el que tenía (también en la pantalla de entrada).
+var DEFCFG=(function(){var c=cfgObj();delete c.ESTILO;return JSON.stringify(c)})();
 // Cambios sin subir de una cuenta que se va de este dispositivo (sale o entra otra): quedan aparte (KEY-sin-subir-<cuenta>)
 // y, cuando esa cuenta vuelve a entrar acá, se recuperan y se juntan con su nube.
 function apartar(u){if(!u||!pendiente()||!HAVECFG)return;try{localStorage.setItem(KEY+"-sin-subir-"+u,JSON.stringify({L:L,cfg:cfgObj(),base:base0(),pend:pendiente()}))}catch(e){}}
@@ -1476,7 +1483,7 @@ $("ias").onclick=async function(){var m=$("iam"),k=$("iak").value.replace(/\s+/g
  m.textContent="Guardando…";var r=await SB.from("ia_claves").upsert({user_id:UID,clave:k,updated_at:new Date().toISOString()});if(r.error)return(m.textContent="No pude guardarla: "+r.error.message);
  $("iak").value="";$("iax").style.display="";m.textContent="Probando…";var p=await SB.functions.invoke("gemini",{body:{probar:true}});
  if(p.error){var t=p.error.message;try{var b=await p.error.context.json();if(b&&b.error)t=b.error}catch(e){}return(m.textContent="La guardé, pero no funcionó: "+t)}
- m.textContent="¡Golazo! Tu clave funciona: desde ahora Petaca usa tu propio cupo."};
+ m.textContent=F("¡Golazo! ","¡Listo! ")+"Tu clave funciona: desde ahora Petaca usa tu propio cupo."};
 $("iax").onclick=async function(){var m=$("iam");if(!SB||!UID)return;var r=await SB.from("ia_claves").delete().eq("user_id",UID);
  m.textContent=r.error?"No pude quitarla: "+r.error.message:"Listo, volvés a usar la IA compartida.";if(!r.error){$("iax").style.display="none";SB.functions.invoke("gemini",{body:{ping:true,fresco:true}}).catch(function(){})}};
 // Tus calendarios: traer los eventos de Google Calendar, el iPhone (iCloud) u Outlook, con un archivo .ics/.zip (una vez)
@@ -1631,15 +1638,20 @@ function preStart(){if(PRE)return;PRE={paso:0,cat:PRECAT.map(function(n){return{
 function preEnd(){$("pre").style.display="none";$("pre").innerHTML="";document.body.classList.remove("pre-open");PRE=null}
 function preCampo(P,k,txt,ph,num){var lb=el("label","",txt),i=el("input");if(num){i.type="number";i.inputMode="decimal";i.min="0"}i.placeholder=ph;i.value=P[k];i.oninput=function(){P[k]=i.value};lb.appendChild(i);return lb}
 function prePaint(){var P=PRE,w=$("pre");w.innerHTML="";var c=el("div","pc");w.appendChild(c);
- var h=el("div","prh"),im=el("img");im.src=pose("gateando",P.eq);im.alt="";h.appendChild(im);var ht=el("div");ht.appendChild(el("small","prk","Pretemporada · paso "+(P.paso+1)+" de 3"));
- var t=el("h2","",["Armá tu plantel de gastos","¿Con cuánto arrancás?","Tu objetivo de ahorro"][P.paso]);t.id="pret";ht.appendChild(t);h.appendChild(ht);c.appendChild(h);
+ var h=el("div","prh"),im=el("img");im.src=pose("gateando",P.eq);im.alt="";h.appendChild(im);var ht=el("div");ht.appendChild(el("small","prk",F("Pretemporada","Bienvenida")+" · paso "+(P.paso+1)+" de 3"));
+ var t=el("h2","",[F("Armá tu plantel de gastos","Tus categorías de gasto"),"¿Con cuánto arrancás?","Tu objetivo de ahorro"][P.paso]);t.id="pret";ht.appendChild(t);h.appendChild(ht);c.appendChild(h);
  var ps=el("div","pasos");for(var i=0;i<3;i++)ps.appendChild(el("i",i<=P.paso?"on":""));c.appendChild(ps);
  var msg=el("p","sem prm");
  if(P.paso===0){
-  var eqw=el("div","preq");eqw.appendChild(el("p","sem","¿De qué cuadro sos? Petaca se pone tu camiseta."));var eqb=el("div","eqbs");
-  Object.keys(EQS).forEach(function(k){var b=el("button","eqb"+(P.eq===k?" on":""));b.type="button";b.setAttribute("aria-pressed",String(P.eq===k));var i=el("img");i.src=EQS[k].img;i.alt="";b.appendChild(i);b.appendChild(el("span","",k?EQS[k].n:"Ninguno"));
-   b.onclick=function(){P.eq=k;prePaint()};eqb.appendChild(b)});eqw.appendChild(eqb);c.appendChild(eqw);
-  c.appendChild(el("p","sem","¡Te damos la bienvenida al club! Elegí en qué gastás y, si querés, ponele un presupuesto por mes a cada categoría: Petaca te avisa cuando te estés por pasar. \"Otros\" va siempre."));
+  // El estilo (futbolero o profesional) y, si es futbolero, el equipo
+  var stw=el("div","preq"),st=el("div","agvis prest"),ve=esPro()?"pro":"fut";st.setAttribute("role","radiogroup");st.setAttribute("aria-label","Estilo de Petaca");st.setAttribute("data-v",ve);
+  [["fut","⚽ Futbolero"],["pro","💼 Profesional"]].forEach(function(o){var b=el("button","",o[1]);b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-checked",String(o[0]===ve));
+   b.onclick=function(){if(o[0]===ve)return;estiloSet(o[0]);vestir();prePaint()};st.appendChild(b)});
+  stw.appendChild(el("p","sem","¿Cómo querés ver Petaca? Profesional es un diseño sobrio, sin la temática de fútbol. Lo podés cambiar cuando quieras."));stw.appendChild(st);c.appendChild(stw);
+  if(!esPro()){var eqw=el("div","preq");eqw.appendChild(el("p","sem","¿De qué cuadro sos? Petaca se pone tu camiseta."));var eqb=el("div","eqbs");
+   Object.keys(EQS).forEach(function(k){var b=el("button","eqb"+(P.eq===k?" on":""));b.type="button";b.setAttribute("aria-pressed",String(P.eq===k));var i=el("img");i.src=EQS[k].img;i.alt="";b.appendChild(i);b.appendChild(el("span","",k?EQS[k].n:"Ninguno"));
+    b.onclick=function(){P.eq=k;prePaint()};eqb.appendChild(b)});eqw.appendChild(eqb);c.appendChild(eqw)}
+  c.appendChild(el("p","sem",F("¡Te damos la bienvenida al club! ","¡Te damos la bienvenida! ")+"Elegí en qué gastás y, si querés, ponele un presupuesto por mes a cada categoría: Petaca te avisa cuando te estés por pasar. \"Otros\" va siempre."));
   P.cat.forEach(function(k){var r=el("div","prc"),lb=el("label"),cb=el("input"),nv=el("input");cb.type="checkbox";cb.checked=k.on;
    nv.type="number";nv.inputMode="decimal";nv.min="0";nv.placeholder="$ / mes";nv.value=k.v;nv.disabled=!k.on;nv.setAttribute("aria-label","Presupuesto por mes de "+k.n);nv.oninput=function(){k.v=nv.value};
    cb.onchange=function(){k.on=cb.checked;nv.disabled=!cb.checked};lb.appendChild(cb);lb.appendChild(document.createTextNode(k.n));r.appendChild(lb);r.appendChild(nv);c.appendChild(r)});
@@ -1652,9 +1664,9 @@ function prePaint(){var P=PRE,w=$("pre");w.innerHTML="";var c=el("div","pc");w.a
   f.appendChild(montoMon(P,"ah","am","¿Cuánto tenés ahorrado? (opcional)","Ej: 300"));f.appendChild(montoMon(P,"iv","im","¿Y cuánto tenés invertido? Plazo fijo, FCI, acciones, cripto… (opcional)","Ej: 200.000"));
   f.appendChild(preCampo(P,"ing","¿Cobraste algo esta semana? (opcional, en pesos)","Ej: 400.000",1));c.appendChild(f)}
  else{
-  c.appendChild(el("p","sem","¿Para qué estás ahorrando? Un viaje, la compu nueva, la entrada para la final… Si todavía no tenés uno, salteá este paso."));
+  c.appendChild(el("p","sem","¿Para qué estás ahorrando? Un viaje, la compu nueva, "+F("la entrada para la final","un curso")+"… Si todavía no tenés uno, salteá este paso."));
   var f2=el("div","prf"),l3=el("label","","Para cuándo"),rw=el("div","add"),gn=el("input"),gu=el("select");
-  f2.appendChild(preCampo(P,"aho","¿Qué % de cada ingreso querés separar para ahorrar? (lo podés cambiar en cada uno)","Ej: 10",1));f2.appendChild(preCampo(P,"gx","Nombre del objetivo","Ej: Viaje al Mundial"));f2.appendChild(preCampo(P,"gt","Cuánto necesitás (US$)","Ej: 2.000",1));
+  f2.appendChild(preCampo(P,"aho","¿Qué % de cada ingreso querés separar para ahorrar? (lo podés cambiar en cada uno)","Ej: 10",1));f2.appendChild(preCampo(P,"gx","Nombre del objetivo",F("Ej: Viaje al Mundial","Ej: Vacaciones")));f2.appendChild(preCampo(P,"gt","Cuánto necesitás (US$)","Ej: 2.000",1));
   gn.type="number";gn.inputMode="numeric";gn.min="1";gn.placeholder="Cuántos";gn.value=P.gn;gn.setAttribute("aria-label","Cantidad");gn.oninput=function(){P.gn=gn.value};
   [["","Sin plazo"],["s","semanas"],["m","meses"],["a","años"]].forEach(function(o){var op=el("option","",o[1]);op.value=o[0];gu.appendChild(op)});gu.value=P.gu;gu.setAttribute("aria-label","Plazo");
   gu.onchange=function(){P.gu=gu.value;gn.style.display=gu.value?"":"none"};gn.style.display=P.gu?"":"none";rw.appendChild(gn);rw.appendChild(gu);l3.appendChild(rw);f2.appendChild(l3);c.appendChild(f2)}
@@ -1662,7 +1674,7 @@ function prePaint(){var P=PRE,w=$("pre");w.innerHTML="";var c=el("div","pc");w.a
  var b=el("div","prb"),izq=el("span"),der=el("span");
  if(P.paso>0){var bk=el("button","x","‹ Atrás");bk.onclick=function(){P.paso--;prePaint()};izq.appendChild(bk)}else{var sk=el("button","x","Saltear todo");sk.onclick=function(){preFin(true)};izq.appendChild(sk)}
  if(P.paso===2){var s2=el("button","x","Saltear");s2.onclick=function(){P.gx="";P.gt="";preFin(false)};der.appendChild(s2)}
- var nx=el("button","",P.paso<2?"Siguiente ›":"¡A la cancha! ⚽");nx.onclick=function(){var e=preCheck();if(e)return(msg.textContent=e);if(P.paso<2){P.paso++;prePaint()}else preFin(false)};der.appendChild(nx);
+ var nx=el("button","",P.paso<2?"Siguiente ›":F("¡A la cancha! ⚽","Empezar"));nx.onclick=function(){var e=preCheck();if(e)return(msg.textContent=e);if(P.paso<2){P.paso++;prePaint()}else preFin(false)};der.appendChild(nx);
  b.appendChild(izq);b.appendChild(der);c.appendChild(b);w.scrollTop=0;
  if(P.paso>0){var fi=c.querySelector(".prf input");if(fi)fi.focus()}}
 function preCheck(){var P=PRE;
@@ -1683,7 +1695,7 @@ function preFin(todo){var P=PRE,NB={};
   AHO=Math.min(preNum(P.aho),100);var iv=preNum(P.ing);if(iv)sumarIng(today,iv,AHO);
   if(P.gx.trim()&&preNum(P.gt)){var n=parseInt(P.gn,10);GOAL={x:P.gx.trim(),target:preNum(P.gt),saved:0,pl:P.gu?{u:P.gu,n:n}:null,hasta:P.gu?sumaPlazo(today,n,P.gu):null}}}
  EQUIPO=eqDe(P.eq);ONB=1;HAVECFG=true;preEnd();vestir();save();render();
- stat(todo?"Listo. Cuando quieras, armá tus categorías en Configuración → Ajustes.":"¡Listo, tu equipo está armado! Lo podés cambiar cuando quieras en Configuración → Ajustes.")}
+ stat(todo?"Listo. Cuando quieras, armá tus categorías en Configuración → Ajustes.":F("¡Listo, tu equipo está armado!","¡Listo, ya está todo configurado!")+" Lo podés cambiar cuando quieras en Configuración → Ajustes.")}
 // Capital inicial: la plata que había en el día a día antes del primer movimiento cargado. Es la base de "te queda" y de los consejos.
 // A quien no lo cargó (cuentas viejas o que saltearon la pretemporada) se lo pedimos al entrar. Si ya corrigió el saldo con ajustes, no hace falta.
 function hayAjustes(){return L.ing.some(function(e){return e.adj})||L.expenses.some(function(e){return e.x==="Ajuste de saldo"})}
@@ -1977,7 +1989,7 @@ async function eqDatos(k,forzar){var e=EQS[k],key="panel-eqd-"+k,c=null;try{c=JS
 function eqCorto(f){var d=new Date(f),h=new Date(),n=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(h.getFullYear(),h.getMonth(),h.getDate()))/864e5);
  return(n===0?"hoy":n===1?"mañana":DN[d.getDay()].slice(0,3).toLowerCase()+" "+d.getDate()+"/"+(d.getMonth()+1))+" "+pad(d.getHours())+":"+pad(d.getMinutes())}
 function eqVs(e,p){return p.loc?e.n+" vs "+p.riv:p.riv+" vs "+e.n}
-async function renderEquipo(forzar){var box=$("eqfix"),sum=$("eqsum"),b=$("eqb");if(!box||!b)return;var k=document.body.classList.contains("auth")?"":EQUIPO,e=EQS[k];
+async function renderEquipo(forzar){var box=$("eqfix"),sum=$("eqsum"),b=$("eqb");if(!box||!b)return;var k=document.body.classList.contains("auth")||esPro()?"":EQUIPO,e=EQS[k];
  if(!k||!e||!e.es){box.hidden=true;return}
  box.hidden=false;var my=EQREQ=(EQREQ||0)+1;
  if(b.dataset.k!==k){b.dataset.k=k;b.innerHTML="";sum.textContent="⚽ "+e.n+": buscando el próximo partido…"}
@@ -2253,6 +2265,18 @@ $("temas").addEventListener("keydown",function(e){if(e.key!=="ArrowLeft"&&e.key!
  t=ts[(i+(e.key==="ArrowRight"?1:2))%3];temaPoner(t);$("temas").querySelector('[data-t="'+t+'"]').focus()});
 temaUI();
 
+// ===== Estilo: futbolero o profesional (sin la temática de fútbol, la mascota ni el fixture) =====
+// Se guarda en la cuenta (cfg.ESTILO, así se ve igual en todos tus dispositivos) y en el dispositivo (tema.js lo aplica antes
+// de dibujar). estiloSet solo lo aplica; estiloPoner es cuando lo elegís vos: además lo guarda y redibuja los textos.
+function estiloUI(){var v=esPro()?"pro":"fut",g=$("estilos");if(!g)return;g.setAttribute("data-v",v);
+ [].forEach.call(g.querySelectorAll("[data-e]"),function(b){b.setAttribute("aria-checked",String(b.dataset.e===v));b.tabIndex=b.dataset.e===v?0:-1})}
+function estiloSet(v){if(window.petacaEstilo)petacaEstilo(v);estiloUI()}
+function estiloPoner(v){if((esPro()?"pro":"fut")===v)return;estiloSet(v);vestir();HAVECFG=true;save();render();
+ toast(v==="pro"?"Listo: Petaca ahora tiene un estilo profesional.":"Listo: volvió el estilo futbolero ⚽")}
+[].forEach.call(document.querySelectorAll("#estilos [data-e]"),function(b){b.onclick=function(){estiloPoner(b.dataset.e)}});
+$("estilos").addEventListener("keydown",function(e){if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return;e.preventDefault();var v=esPro()?"fut":"pro";estiloPoner(v);$("estilos").querySelector('[data-e="'+v+'"]').focus()});
+estiloUI();
+
 // ===== Bloqueo con PIN (y huella o Face ID) =====
 // Es por dispositivo: el PIN se guarda como huella SHA-256 con sal (nunca tal cual) y la huella o Face ID usa una passkey
 // del propio celular (WebAuthn), sin servidor. Se pide al abrir Petaca y al volver después del tiempo elegido.
@@ -2304,7 +2328,7 @@ async function lockUI(){var w=$("lockf");if(!w)return;var c=lockCfg(),hay=await 
  var q=el("button","x","Quitar el PIN");q.onclick=function(){var v=prompt("Para quitar el bloqueo, escribí tu PIN actual:");if(v==null)return;
   pinHash(v.trim(),c.s).then(function(h){if(h!==c.h){msg2.textContent="Ese no es tu PIN.";return}lockGuardar(null);toast("Quité el PIN de este dispositivo.");lockUI()})};
  r2.appendChild(q);w.appendChild(r2);w.appendChild(msg2)}
-$("prd").addEventListener("toggle",function(){if($("prd").open){temaUI();lockUI()}});
+$("prd").addEventListener("toggle",function(){if($("prd").open){estiloUI();temaUI();lockUI()}});
 
 // ===== Arriba: ⋯ (Configuración, guía, armar la formación, bloquear y cerrar sesión) =====
 function cerrarMas(){var p=$("maspop");if(p&&!p.hidden){p.hidden=true;$("masb").setAttribute("aria-expanded","false")}}

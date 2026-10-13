@@ -821,3 +821,172 @@ html.oscuro .age.rut{border-left-color:var(--cel)}
  .cancha .pelota{display:none}
  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Selector de estilo (Configuración y bienvenida): dos opciones en la pastilla */
+#estilos,.prest{--n:2}
+#estilos[data-v="pro"],.prest[data-v="pro"]{--i:1}
+.prest{margin:8px 0 14px}
+
+/* ===== Estilo profesional (html.pro, lo pone tema.js): sobrio, sin la temática de fútbol, la mascota ni el fixture =====
+   Superficies planas con borde fino y sombra suave, la letra del sistema, títulos sin mayúsculas y un solo acento (azul).
+   Los textos que cambian van dos veces en el HTML (.solo-fut y .solo-pro). Los :where(html.pro) tienen la especificidad
+   de la regla base, así los componentes con reglas propias las siguen pisando y se ajustan uno por uno más abajo. */
+html.pro .solo-fut,html:not(.pro) .solo-pro{display:none!important}
+html.pro body{
+ --bg:#F4F6F9;--bg2:#F4F6F9;--panel:#FFFFFF;--ink:#141A23;--mute:#5A6372;--line:#E3E7ED;--campo:#C9D0DA;
+ --acc:#2457D6;--acc2:#1D47B3;--acc-t:#1D47B3;--sun:#DCE6FC;--cel:#9DB7F2;--warn:#C42B3F;--ok:#177A4B;
+ --h1:#1D2736;--h2:#141B26;--kpi:#F7F9FB;--kpi2:#E8EEFC;--trk:#E7EBF0;--ring:rgba(36,87,214,.2);
+ --papel-aviso:#FFFFFF;--linea-aviso:#E3E7ED;--tinta:#141A23;--trazo:#E3E7ED;--sombra-c:transparent;--sel:#2457D6;
+ --radio:14px;--radio-s:10px;--camiseta:none;
+ --f-tablero:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--f-cond:var(--f-tablero);--f-txt:var(--f-tablero);
+ --borde:1px solid transparent;--sombra:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.07);
+ font-weight:400}
+html.pro.oscuro body{
+ --bg:#0F1218;--bg2:#0F1218;--panel:#171B22;--ink:#E7EAF0;--mute:#9AA3B2;--line:#272D38;--campo:#394252;
+ --acc:#3D6FE8;--acc2:#7FA6FF;--acc-t:#8EB0FF;--sun:#C9D8FF;--cel:#6F8FD8;--warn:#F07A8B;--ok:#4CC488;
+ --h1:#1C2330;--h2:#151A23;--kpi:#1C2129;--kpi2:#1D2A44;--trk:#2A313D;--ring:rgba(142,176,255,.3);
+ --papel-aviso:#171B22;--linea-aviso:#272D38;--tinta:#0B0E13;--trazo:#272D38;--sel:#3D6FE8;
+ --sombra:0 1px 2px rgba(0,0,0,.45)}
+/* Fuera la cancha, el estadio, la mascota, las camisetas y el partido */
+html.pro :is(.cancha,.tablero,.masc,.descanso,.credito,#eqfix,.prh img,.lockc img,.charla img){display:none!important}
+html.pro .eqsel:not(.masel){display:none}
+html.pro .estadio{background:var(--bg)}
+html.pro .estadio::after{display:none}
+html.pro :is(section h2,section>details:first-child>summary)::before{display:none}
+/* Letra y títulos */
+:where(html.pro) :is(b,strong){font-weight:600}
+:where(html.pro) h3{font:600 15px/1.3 var(--f-txt);letter-spacing:0;text-transform:none}
+:where(html.pro) summary{font-weight:600}
+html.pro h1{font:700 21px/1.1 var(--f-txt);letter-spacing:.14em;transform:none;text-shadow:none}
+html.pro .sub{margin-top:3px;font:500 13px/1.3 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro .sub::first-letter{text-transform:uppercase}
+html.pro section h2,html.pro section>details:first-child>summary{font:600 17px/1.3 var(--f-txt);letter-spacing:-.01em;text-transform:none}
+html.pro h2.grp{margin:30px 0 12px 2px;padding:0;font:700 19px/1.25 var(--f-txt);letter-spacing:-.01em;text-transform:none;color:var(--ink)}
+html.pro h2.grp::before{display:none}
+html.pro .goal h3{font-weight:700;letter-spacing:-.01em}
+html.pro .goal h3.tgh3{font-size:15px;font-weight:600;letter-spacing:0}
+html.pro .gh span{font:700 22px/1 var(--f-txt);letter-spacing:-.01em}
+html.pro .grupo.menu.primero::before{font:600 12px/1 var(--f-txt);letter-spacing:.08em}
+html.pro .guia .claves>b{font:600 15px/1.2 var(--f-txt);letter-spacing:0;text-transform:none}
+/* Tarjetas, listas y flechas */
+html.pro :is(section,#hoy){border:1px solid var(--line)}
+html.pro :where(.row,.tip,.agd,.prc,.fijos){border-top-style:solid;border-top-width:1px}
+html.pro .guia :is(.gtema,.hintsw){border-top-style:solid;border-top-width:1px}
+html.pro :is(section.plg>h2,summary)::after{border-color:var(--mute);border-width:0 2px 2px 0}
+html.pro .hint{border-left-width:3px;border-left-color:var(--cel)}
+/* Botones y campos */
+:where(html.pro) button{border-radius:10px;font:600 15px/1.2 var(--f-txt);letter-spacing:0;text-transform:none}
+:where(html.pro) button:active{transform:translateY(1px)}
+:where(html.pro) :is(input,select,textarea){border-width:1px;border-radius:10px;font-weight:400}
+html.pro :is(#un,#ar,#mic,#lr,#bi,#tgt,#calpg){border-color:var(--line)}
+html.pro button.eqchip{border:1px solid var(--line);box-shadow:none}
+html.pro .eqpop{border:1px solid var(--line);box-shadow:0 12px 32px rgba(16,24,40,.14)}
+html.pro button.menub{border:1px solid var(--line);box-shadow:var(--sombra);font:600 17px/1.25 var(--f-txt);letter-spacing:-.01em;text-transform:none}
+html.pro button.menub>i{font-size:22px}
+html.pro button.menub::after{width:9px;height:9px;border-width:0 2px 2px 0}
+html.pro button.menub:active{transform:none;box-shadow:var(--sombra)}
+html.pro .grupo.menu.abierto button.menub{background:var(--panel);color:var(--ink);border-color:var(--acc)}
+html.pro .grupo.menu.abierto button.menub small{color:var(--mute)}
+html.pro .calfile span{border:1px solid var(--line);border-radius:10px;box-shadow:none;font:600 15px/1 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro a.btnlink{border:0;border-radius:10px;box-shadow:none;font:600 15px/1 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro .agvis{border:1px solid var(--line)}
+html.pro .agvis button{font:600 14px/1 var(--f-txt);letter-spacing:0}
+html.pro button.agf{border:1px solid var(--line);box-shadow:none}
+html.pro button.aghoy{color:var(--acc2);box-shadow:none;font:600 14px/1 var(--f-txt);letter-spacing:0}
+html.pro .wpc button{font:600 14px/1 var(--f-txt);letter-spacing:0;border-width:1px}
+html.pro .wpc button.on{box-shadow:none}
+html.pro .dias button.dia{border-width:1px;font:600 15px/1 var(--f-txt)}
+html.pro .dias button.dia.on{box-shadow:none}
+html.pro .ordbar{font:600 12.5px/1.2 var(--f-txt);letter-spacing:.02em;text-transform:none}
+/* Tu plata: una tarjeta oscura y lisa, sin la cancha */
+html.pro .hero{background:linear-gradient(160deg,var(--h1),var(--h2));border:1px solid transparent}
+html.pro .hero::before,html.pro .hero::after{display:none}
+html.pro #frase small{font:500 13px/1.3 var(--f-txt);letter-spacing:.01em;text-transform:none;color:rgba(255,255,255,.75)}
+html.pro #frase b{font:700 42px/1.1 var(--f-txt);letter-spacing:-.02em;text-shadow:none}
+html.pro #frase b.neg{color:#FF9AA8}
+html.pro .medios .chip{background:rgba(255,255,255,.1);font:500 13px/1.3 var(--f-txt);letter-spacing:0}
+html.pro .medios .chip b{font-weight:600;font-size:15px}
+html.pro .hero .track{background:rgba(255,255,255,.18)}
+html.pro .hero .fill{background:#8FB0F7!important}
+html.pro .hero .fill.over{background:#FF9AA8!important}
+html.pro .hero .add>button:not(.x):not(.lk),html.pro .hero .fjb button:not(.x){background:#fff;color:#141A23}
+html.pro .hmodo{background:rgba(255,255,255,.12)}
+html.pro .hmodo::before{background:#fff}
+html.pro .hero .hmodo button[role="tab"]{font:600 15px/1 var(--f-txt);letter-spacing:0}
+html.pro .hero .hint{background:rgba(255,255,255,.08);border-left-color:rgba(255,255,255,.4)}
+html.pro .fijp{background:rgba(255,255,255,.08)}
+html.pro .fijp .fjt{font:600 13px/1.2 var(--f-txt);letter-spacing:.02em;text-transform:none}
+/* Resumen y consejos */
+html.pro .kpi{border-width:1px}
+html.pro .kpi small{font:600 11.5px/1.2 var(--f-txt);letter-spacing:.05em}
+html.pro .kpi b{font:700 19px/1.25 var(--f-txt);letter-spacing:-.01em;overflow-wrap:break-word;hyphens:auto}
+html.pro .kpi:first-child{background:var(--tinta);border-color:var(--tinta);box-shadow:none}
+html.pro .kpi:first-child b{font:700 32px/1.1 var(--f-txt);letter-spacing:-.02em;color:#fff}
+html.pro .kpi:first-child.mal b{color:#FF9AA8}
+html.pro .tip>i,html.pro .tip:not(.mal):not(.ojo):not(.bien)>i{width:8px;height:8px;border-radius:50%;margin-top:7px;transform:none;box-shadow:none}
+html.pro .tip.bien>i{width:8px;height:8px;background:var(--ok);margin-top:7px}
+html.pro .tip.bien>i::before{content:none}
+html.pro .tip .tipk{font:600 11.5px/1.2 var(--f-txt);letter-spacing:.05em}
+/* ¿Qué tenés hoy? y la agenda */
+html.pro #hoy{background:var(--panel)}
+html.pro #hoy>b{font:600 16px/1.3 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro #hoy>b::before{display:none}
+html.pro #hoy>b small{font:500 14px/1 var(--f-txt);letter-spacing:0}
+html.pro #hoy .ev{border-top-style:solid;border-top-width:1px}
+html.pro #hoy .ev:first-of-type{border-top:0}
+html.pro #hoy .ev small.tag{font:600 11px/1 var(--f-txt);letter-spacing:.03em;border-width:1px}
+html.pro #hoy .hoyd button{font:600 13px/1 var(--f-txt);letter-spacing:0;text-transform:none;border-width:1px}
+html.pro #hoy .hoyd button.on{color:#fff;border-color:var(--sel)}
+html.pro .agnav>b{font:600 16px/1.3 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro .agnav>b::first-letter{text-transform:uppercase}
+html.pro .agdia small{font:600 11px/1 var(--f-txt);letter-spacing:.04em}
+html.pro .agdia b{font:700 20px/1 var(--f-txt)}
+html.pro .agd.hoy .agdia{border:1px solid transparent}
+html.pro .age{border-width:1px 1px 1px 3px}
+html.pro .age time{font:600 15px/1.15 var(--f-txt)}
+html.pro .age time small{font:500 12px/1.2 var(--f-txt)}
+html.pro .age time.td{font:600 11px/1.15 var(--f-txt);letter-spacing:.02em}
+html.pro .ev time{font:600 15px/1.3 var(--f-txt)}
+html.pro .agd.libre b{font:600 14px/1.2 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro .mg>b{font:600 12px/1 var(--f-txt);letter-spacing:.02em}
+html.pro .mg button{font:600 15px/1 var(--f-txt);border-width:1px}
+html.pro .mg button:hover{border-color:var(--campo)}
+html.pro .mg button.s{box-shadow:none}
+html.pro .mdia{border-top:1px solid var(--line)}
+html.pro .mdia>b{font:600 16px/1.3 var(--f-txt);letter-spacing:0;text-transform:none}
+html.pro .mdia>b small{font:600 12px/1.2 var(--f-txt);letter-spacing:.02em}
+/* Aviso de abajo, barra del celu, bienvenida y bloqueo */
+html.pro #toast{border:0;border-radius:12px;box-shadow:0 10px 30px rgba(16,24,40,.25)}
+html.pro #toast button{border-radius:8px}
+html.pro .tabs button{font:600 11px/1.1 var(--f-txt);letter-spacing:.01em}
+html.pro .tabs button.tabnota i,html.pro .tabs button.tabnota[aria-current="true"] i{background:var(--acc);color:#fff}
+html.pro #pre{background:rgba(15,20,30,.5)}
+html.pro #pre .pc{border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px rgba(16,24,40,.25)}
+html.pro .prh h2{font:700 22px/1.2 var(--f-txt);letter-spacing:-.01em}
+html.pro .prk{font:600 12px/1.2 var(--f-txt);letter-spacing:.06em}
+html.pro .lockc h2{font:700 22px/1.2 var(--f-txt);letter-spacing:0}
+html.pro .lockp button{border:1px solid var(--line);box-shadow:none;font:500 24px/1 var(--f-txt)}
+html.pro .lockp button.bio{font:600 13px/1.1 var(--f-txt)}
+html.pro .lockd i{border-color:var(--mute)}
+/* Pantalla de entrada: una tarjeta sobre fondo liso, sin la cancha */
+html.pro body.auth,html.pro body.auth .estadio{background:var(--bg)}
+html.pro body.auth::before,html.pro body.auth::after{display:none}
+html.pro body.auth .top h1{font:700 30px/1.1 var(--f-txt);letter-spacing:.18em;color:var(--ink);text-shadow:none}
+html.pro body.auth .lema{color:var(--mute);text-shadow:none;font-weight:500}
+html.pro body.auth #login,html.pro body.auth #rec{border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 40px rgba(16,24,40,.12)}
+html.pro body.auth #login h2,html.pro body.auth #rec h2{font:700 21px/1.2 var(--f-txt);letter-spacing:-.01em}
+html.pro body.auth #aviso{color:var(--mute)!important}
+/* Oscuro: la tarjeta de Tu plata con borde, para que se separe del fondo */
+html.pro.oscuro .hero{border-color:var(--line)}
+html.pro.oscuro .kpi:first-child{border-color:var(--line)}
+@media (max-width:720px){
+ html.pro h1{font-size:19px}
+ html.pro #frase b{font-size:36px}
+ html.pro .kpi:first-child b{font-size:28px}
+ html.pro h2.grp{font-size:18px;margin:24px 0 10px 2px}
+ html.pro button.menub{font-size:16px}
+ html.pro body.auth .top h1{font-size:28px}
+}
+@media (max-width:380px){
+ html.pro #frase b{font-size:32px}
+}
