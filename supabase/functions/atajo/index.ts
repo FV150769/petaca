@@ -2,7 +2,10 @@
 // porque el Atajo no tiene sesión; por eso cada camino se cuida solo:
 // - Desde el panel, con la sesión iniciada: {accion:"crear"} arma una clave nueva para el Atajo (la anterior deja de andar) y
 //   la devuelve una sola vez; {accion:"quitar"} la borra; {accion:"estado"} dice si hay una y cuándo se usó.
-// - Desde el Atajo, con la clave en el encabezado "Clave": {accion:"gasto", monto, categoria?, detalle?, medio?},
+// - Desde el Atajo, lo más simple (4 acciones, sin configurar nada): GET /atajo?k=CLAVE&t=lo que dijiste. Petaca se fija
+//   si es una pregunta ("¿cuánto me queda?", "¿qué tengo mañana?"), si querés deshacer ("borrá lo último") o si es algo para
+//   anotar (va a la bandeja como nota y la página lo entiende igual que Contale).
+// - Desde el Atajo, por partes, con la clave en el encabezado "Clave": {accion:"gasto", monto, categoria?, detalle?, medio?},
 //   {accion:"ingreso", monto, medio?, ahorro?}, {accion:"nota", texto}, {accion:"queda"}, {accion:"agenda"},
 //   {accion:"categorias"} y {accion:"deshacer"} (borra lo último que mandaste, si todavía no entró al panel).
 //   Contesta en texto, así el Atajo lo muestra y Siri lo lee en voz alta; repite lo que entendió, por si Siri escuchó mal.
@@ -147,6 +150,18 @@ function agendaTxt(res: any) {
   return dia(hoyAR(), "Hoy") + " " + dia(hoyAR(1), "Mañana");
 }
 
+// Lo que le dijiste a Petaca: ¿una pregunta, deshacer o algo para anotar? Las preguntas son cortas y sin montos, así
+// "tengo que pagar la luz mañana" o "me equivoqué, eran 6 mil" se anotan (y la página los entiende como en Contale).
+function queEs(t: string) {
+  const n = sinTildes(t).replace(/[¿?¡!.,;:]/g, " ").replace(/\s+/g, " ").trim();
+  if (!n) return "vacio";
+  const corta = n.split(" ").length <= 7 && !/\d/.test(n);
+  if (corta && /\b(deshac\w*|(borra|anula|cancela|saca)\w* (lo|el|la) ultim[oa])\b/.test(n)) return "deshacer";
+  if (corta && /\b(cuanto|cuanta plata)( me)? (queda|tengo|hay|gaste|llevo)\b|\bme queda\b|\bsaldo\b/.test(n)) return "queda";
+  if (corta && (/^(y )?(que|q) (tengo|hay|tenemos|me toca|hago)\b/.test(n) || /^(mi |la )?agenda\b/.test(n))) return "agenda";
+  return "nota";
+}
+
 // Pedidos del Atajo (con la clave)
 async function atajo(clave: string, body: any) {
   if (!/^pt_[A-Za-z0-9_-]{32}$/.test(clave)) return texto("La clave no es válida. En Petaca: ⚙️ Configuración → Atajos del iPhone.", 401);
@@ -155,7 +170,9 @@ async function atajo(clave: string, body: any) {
   const uid = k.user_id;
   await sb.from("atajo_claves").update({ usado: new Date().toISOString() }).eq("user_id", uid);
 
-  const accion = sinTildes(String(body?.accion ?? "")).trim();
+  let accion = sinTildes(String(body?.accion ?? "")).trim();
+  if (accion === "decir") accion = queEs(String(body.texto ?? ""));
+  if (accion === "vacio") return texto("No te escuché. Probá de nuevo: por ejemplo \"gasté 8 mil en farmacia\" o \"¿cuánto me queda?\".", 400);
   const { data: ps } = await sb.from("panel_state").select("data").eq("user_id", uid).maybeSingle();
   const d: any = ps?.data ?? {};
   const cats = Object.keys(d.cfg?.BUDGET ?? {});
@@ -211,7 +228,7 @@ async function atajo(clave: string, body: any) {
     const t = String(body.texto ?? "").replace(/\s+/g, " ").trim().slice(0, 500);
     if (!t) return texto("No me llegó la nota. Probá de nuevo.", 400);
     datos = { f, t };
-    ok = "Anotado ✅ \"" + t + "\". Cuando abras Petaca lo confirmás.";
+    ok = "Anotado ✅ \"" + t + "\". Entra cuando abras Petaca. Si escuché mal, decime \"borrá lo último\".";
   }
   const { error } = await sb.from("atajo_bandeja").insert({ user_id: uid, tipo, datos });
   if (error) return texto("No pude guardarlo. Probá de nuevo en un rato.", 500);
@@ -222,7 +239,27 @@ async function atajo(clave: string, body: any) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return texto("Usá POST (en el atajo: Obtener contenido de URL → Método: POST).", 405);
+  // El atajo simple: la clave y lo que dijiste van en la dirección (?k=…&t=…). Si el atajo codificó el texto dos veces, se
+  // decodifica de nuevo.
+  if (req.method === "GET") {
+    const u = new URL(req.url);
+    let t = u.searchParams.get("t") ?? "";
+    if (/%[0-9A-Fa-f]{2}/.test(t)) {
+      try {
+        t = decodeURIComponent(t);
+      } catch {
+        // queda como vino
+      }
+    }
+    const k = (u.searchParams.get("k") ?? "").trim();
+    if (!k) return texto("Falta tu clave. En Petaca: ⚙️ Configuración → Atajos del iPhone → Crear clave, y copiá tu dirección.", 401);
+    try {
+      return await atajo(k, { accion: "decir", texto: t });
+    } catch (_) {
+      return texto("Algo falló de mi lado. Probá de nuevo en un rato.", 500);
+    }
+  }
+  if (req.method !== "POST") return texto("Método no permitido.", 405);
   const body = await req.json().catch(() => ({}));
   const clave = (req.headers.get("clave") ?? "").trim();
   try {

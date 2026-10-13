@@ -931,7 +931,7 @@ var NOTAT=null,AUDIO=null;
 var MEDN=null;
 function medir(res){var m=MEDN;MEDN=null;if(!m||!SB||!UID)return;m.resultado=res;try{SB.from("notas_medidas").insert(m).then(function(){},function(){})}catch(e){}}
 $("nb").onclick=async function(){
- var au=AUDIO;AUDIO=null;
+ var au=AUDIO,auto=ATAUTO;AUDIO=null;ATAUTO=false;
  var txt=$("nt").value.trim(),out=$("nr");if(!txt&&!au||busy)return;
  if(MEDN)medir("otra nota");
  out.textContent=au?"Escuchando tu audio…":"Entendiendo tu nota…";
@@ -1092,8 +1092,12 @@ $("nb").onclick=async function(){
     if(SPo.length&&n===SPo.length)toast("Listo: pasé "+money(SPo[0].ars)+" al ahorro (≈ "+usd(SPo[0].ars/L.fx)+"). Te quedan "+mny(diaVal())+" en "+ACC[0][0]+".");else
     toast(nc?"Listo, "+(nc===1?"corregí lo que me dijiste":"corregí "+nc+" cosas")+(n>nc?" y guardé el resto":"")+".":"Guardé lo de tu nota.")};
    no.onclick=function(){out.innerHTML="";medir("descarto")};
-   out.appendChild(yes);out.appendChild(no)}
-  draw();
+   out.appendChild(yes);out.appendChild(no);return yes}
+  var si=draw();
+  // Del atajo del iPhone: lo que se entendió al instante (sin IA) y sin dudas se guarda solo; el aviso tiene Deshacer.
+  // Si hizo falta la IA o algo parece mal (monto raro o repetido), queda la vista previa para confirmarlo.
+  if(auto&&si&&via==="rapida"&&!SPo.length&&!RSo.length&&G.every(function(g){return!dudoso("g",g.m,g.f,g.c)})&&IN.every(function(i){return!dudoso("i",i.v,i.f)})){
+   IN.forEach(function(i){if(i.p==null)i.p=AHO});si.onclick()}
  }catch(e){medir("error");out.textContent="No pude procesar la nota: "+(e&&(e.message||e.code)||"error");reportar("No pude procesar la nota: "+(e&&(e.message||e.code)||"error"),e&&e.stack)}
  finally{busy=false;$("nb").disabled=false;esp.forEach(clearTimeout)}
 };
@@ -2150,7 +2154,7 @@ $("tgo").onclick=function(){var d=$("tgd");mostrar(d);d.open=true;tgUI();d.scrol
 // sincronizar. Para contestar "¿cuánto me queda?" y la agenda sin abrir la app, cada vez que se sube la cuenta va también un
 // resumen (data.res). RESHOY: de qué día es el resumen que está en la nube (si es de otro día, se sube uno nuevo).
 var ATAJO_LINK=""; // link de iCloud del atajo ya armado (en Atajos: Compartir → Copiar enlace de iCloud), para instalarlo con un toque
-var RESHOY="",ATRAE=false;
+var RESHOY="",ATRAE=false,ATAUTO=false; // ATAUTO: la próxima nota viene del atajo (si se entiende sin dudas, se guarda sola)
 function resumenAtajo(){try{var by={},tot=0,ag={},n=14;
  allExp(ym).forEach(function(e){tot+=e.m;by[e.c]=(by[e.c]||0)+e.m});
  for(var i=0;i<n;i++){var f=plus(today,i),q=occs(f).slice().sort(porHora);if(q.length)ag[f]=q.slice(0,12).map(function(e){return(e.r?e.r.t+(e.r.t2?"–"+e.r.t2:""):e.t||"")+"|"+(e.r?e.r.x:e.x)})}
@@ -2176,13 +2180,16 @@ async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE||LOCKED)return;ATRAE=tr
   if(G.length||I.length){save();render()}
   var q=[];if(G.length)q.push(G.length===1?"un gasto de "+money(G[0].m)+" en "+G[0].c:cant(G.length,"gasto","gastos"));if(I.length)q.push(I.length===1?"un ingreso de "+money(I[0].v):cant(I.length,"ingreso","ingresos"));
   var msg=q.length?"Del atajo del iPhone sumé "+q.join(" y ")+".":"";
-  if(N.length){var nt=$("nt"),out=$("nr"),ocupado=busy||nt.value.trim()||out.querySelector("button");nt.value=(nt.value.trim()?nt.value.trim()+". ":"")+N.join(". ");
-   var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
-   if(!ocupado)$("nb").click();msg+=(msg?" ":"")+(N.length===1?"Te traje una nota del atajo: ":"Te traje "+N.length+" notas del atajo: ")+(ocupado?"están en Contale, tocá Entender nota.":"revisala y tocá Guardar.")}
+  if(N.length){var nt=$("nt"),out=$("nr"),ocupado=busy||nt.value.trim()||out.querySelector("button"),dicho=N.join(". ");nt.value=(nt.value.trim()?nt.value.trim()+". ":"")+dicho;
+   if(!ocupado){ATAUTO=true;$("nb").click()}
+   // Si se guardó sola, el cuadro queda vacío; si no, la vista previa espera que la confirmes.
+   if(!ocupado&&!nt.value.trim())msg+=(msg?" ":"")+"Guardé lo que le dijiste al atajo: \""+dicho.slice(0,120)+"\".";
+   else{var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
+    msg+=(msg?" ":"")+(N.length===1?"Te traje una nota del atajo: ":"Te traje "+N.length+" notas del atajo: ")+(ocupado?"están en Contale, tocá Entender nota.":"revisala y tocá Guardar.")}}
   if(msg)toast(msg)}
  catch(e){reportar("Atajo: no pude traer la bandeja",e&&(e.stack||e.message))}finally{ATRAE=false}}
 async function atajoFn(body){var r=await SB.functions.invoke("atajo",{body:body});if(r.error){var t=r.error.message;try{var b=await r.error.context.json();if(b&&b.error)t=b.error}catch(e){}throw new Error(t)}return r.data||{}}
-async function atajoUI(){var m=$("atm");$("atu").value=SUPABASE_URL+"/functions/v1/atajo";
+async function atajoUI(){var m=$("atm");
  if(ATAJO_LINK){var l=$("atl");l.hidden=false;l.innerHTML="";var a=el("a","btnlink","📲 Instalar el atajo");a.href=ATAJO_LINK;a.target="_blank";a.rel="noopener";l.appendChild(a);l.appendChild(document.createTextNode(" Te pide la clave al instalarlo."))}
  if(!SB||!UID){m.textContent="Iniciá sesión primero.";return}
  m.textContent="Revisando…";try{var d=await atajoFn({accion:"estado"});
@@ -2193,14 +2200,14 @@ $("atd").addEventListener("toggle",function(){if($("atd").open)atajoUI()});
 $("atc").onclick=async function(){var m=$("atm"),b=this;if(!SB||!UID)return(m.textContent="Iniciá sesión primero.");
  if(!$("atx").hidden&&!confirm("La clave que tenés ahora deja de andar y vas a tener que pegar la nueva en el atajo. ¿Crear una nueva?"))return;
  b.disabled=true;m.textContent="Creando tu clave…";
- try{var d=await atajoFn({accion:"crear"});$("atki").value=d.clave;$("atk").hidden=false;$("atx").hidden=false;b.textContent="Crear una clave nueva";
-  await push().catch(function(){});m.textContent="✅ Listo. Copiala y pegala en el atajo (Encabezados → Clave)."}
+ try{var d=await atajoFn({accion:"crear"});$("atki").value=SUPABASE_URL+"/functions/v1/atajo?k="+d.clave+"&t=";$("atp").open=true;$("atk").hidden=false;$("atx").hidden=false;b.textContent="Crear una clave nueva";
+  await push().catch(function(){});m.textContent="✅ Listo. Copiá tu dirección y seguí los 4 pasos de abajo."}
  catch(e){m.textContent="No pude crear la clave: "+(e&&e.message||e)}finally{b.disabled=false}};
 $("atx").onclick=async function(){if(!confirm("El atajo deja de andar hasta que crees una clave nueva. ¿Desvincular?"))return;
  try{await atajoFn({accion:"quitar"});$("atk").hidden=true;$("atki").value="";await atajoUI()}catch(e){$("atm").textContent="No pude desvincularlo: "+(e&&e.message||e)}};
 function copiar(i,b){var v=$(i).value;if(!v)return;var fin=function(){if(!b.dataset.t)b.dataset.t=b.textContent;b.textContent="✅ Copiado";clearTimeout(b._t);b._t=setTimeout(function(){b.textContent=b.dataset.t},1500)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(fin,function(){$(i).select()});else{$(i).select();try{document.execCommand("copy");fin()}catch(e){}}}
-$("atkc").onclick=function(){copiar("atki",this)};$("atuc").onclick=function(){copiar("atu",this)};
+$("atkc").onclick=function(){copiar("atki",this)};
 
 // ===== Pantalla: tema claro u oscuro (tema.js lo aplica antes de dibujar la página) =====
 function temaUI(){var t=window.petacaTemaActual?petacaTemaActual():"auto",g=$("temas");if(!g)return;g.setAttribute("data-v",t);
