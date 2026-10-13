@@ -55,7 +55,7 @@ function vestir(){var a=document.body.classList.contains("auth"),e=EQS[a?"":EQUI
    cr.appendChild(document.createTextNode(", por "+f.a+" ("));var l2=document.createElement("a");l2.href=f.lu;l2.target="_blank";l2.rel="noopener";l2.textContent=f.l;cr.appendChild(l2);cr.appendChild(document.createTextNode("), vía Wikimedia Commons."))}}}
 var KEY="panel-local-v1",L={events:[],expenses:[],saves:[],hidden:[],skip:[],ing:[],mv:[],inv:[],bal:{},fxAuto:true};
 try{var s=localStorage.getItem(KEY);if(s)L=JSON.parse(s);if(!L.saves)L.saves=[];if(!L.hidden)L.hidden=[];if(!L.skip)L.skip=[];if(!L.ing)L.ing=[];if(!L.bal)L.bal={};if(!L.rskip)L.rskip=[];if(!L.calno)L.calno=[];if(!L.mv)L.mv=[];if(!L.inv)L.inv=[];if(!L.fijos)L.fijos=[];if(L.fxAuto==null)L.fxAuto=true}catch(e){}
-var DOC=null,VER="v80";
+var DOC=null,VER="v81";
 var SUPABASE_URL="https://jrsjnmutdnzuxqimroaa.supabase.co";
 var SUPABASE_KEY="sb_publishable__BLdyenbNV0eqb-5MdL2Cw_48V2WwDA";
 var SB=null,UID=null;
@@ -1096,10 +1096,14 @@ $("nb").onclick=async function(){
    no.onclick=function(){out.innerHTML="";medir("descarto");if(ATNOTA!=null){$("nt").value="";atajoFin("descarto")}};
    out.appendChild(yes);out.appendChild(no);return yes}
   var si=draw();
-  // Del atajo del iPhone: lo que se entendió al instante (sin IA) y sin dudas se guarda solo; el aviso tiene Deshacer.
-  // Si hizo falta la IA o algo parece mal (monto raro o repetido), queda la vista previa para confirmarlo.
-  if(auto&&si&&via==="rapida"&&!SPo.length&&!RSo.length&&G.every(function(g){return!dudoso("g",g.m,g.f,g.c)})&&IN.every(function(i){return!dudoso("i",i.v,i.f)})){
-   IN.forEach(function(i){if(i.p==null)i.p=AHO});si.onclick()}
+  // Del atajo del iPhone: se guarda solo, también lo que entendió la IA (el aviso tiene Deshacer y marca los montos raros o
+  // repetidos, en ATOJO). Queda para confirmar solo si la IA no respondió y se adivinó sin ella, o si falta un dato (cuánto
+  // tenés hoy, para ahorrar un %).
+  if(auto&&si&&via!=="sin IA"&&via!=="claude"&&!SPo.some(function(s){return s.falta})){
+   G.forEach(function(g){var q=dudoso("g",g.m,g.f,g.c);if(q)ATOJO.push(q)});IN.forEach(function(i){var q=dudoso("i",i.v,i.f);if(q)ATOJO.push(q);if(i.p==null)i.p=AHO});
+   ATSOLA=true;si.onclick();ATSOLA=false;if(ATNOTA!=null)ATOJO.length=0}
+  // Si quedó para confirmar, el aviso lo dice (cuando termine esta nota, así ya no dice "Estoy entendiendo…").
+  if(auto&&ATNOTA!=null)setTimeout(function(){var m=atajoNota();if(m)toast(m)},0);
  }catch(e){medir("error");out.textContent="No pude procesar la nota: "+(e&&(e.message||e.code)||"error");if(ATNOTA!=null){out.textContent+=". Era lo que le dijiste al atajo: \""+txt+"\".";$("nt").value="";atajoFin("error")}reportar("No pude procesar la nota: "+(e&&(e.message||e.code)||"error"),e&&e.stack)}
  finally{busy=false;$("nb").disabled=false;esp.forEach(clearTimeout)}
 };
@@ -2191,23 +2195,27 @@ async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE||LOCKED)return;ATRAE=tr
 // ATNOTA: la nota del atajo que está ahora en Contale (null si no hay ninguna).
 var ATNOTA=null;
 function atCola(v){var k=KEY+"-atcola-"+UID;try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"[]")||[];if(v.length)localStorage.setItem(k,JSON.stringify(v));else localStorage.removeItem(k)}catch(e){}return[]}
-// Pasa las notas a Contale: las que se entienden sin dudas se guardan solas; la primera que necesita que la confirmes queda en la
+// Pasa las notas a Contale de a una y se guardan solas. Si alguna necesita que la confirmes (la IA no respondió), queda en la
 // vista previa y las demás esperan. Devuelve el aviso para mostrar.
-function atajoNota(){var nt=$("nt"),out=$("nr"),c=atCola(),hechas=[],noent=ATNOENT.splice(0);if(!UID||LOCKED||ATNOTA!=null||!c.length&&!noent.length)return"";
- while(c.length&&!busy&&!nt.value.trim()&&!out.querySelector("button")){var t=c[0];ATNOTA=t;nt.value=t;ATAUTO=true;$("nb").click();
-  if(ATNOTA!=null)break;if(ATULT==="guardo")hechas.push(t);c=atCola()}
- noent=noent.concat(ATNOENT.splice(0));
- var m=hechas.length?(hechas.length===1?"Guardé lo que le dijiste al atajo: \""+hechas[0].slice(0,120)+"\".":"Guardé "+hechas.length+" cosas que le dijiste al atajo."):"",resto=atCola().length;
+function atajoNota(){var nt=$("nt"),out=$("nr"),c=atCola();if(!UID||LOCKED)return"";
+ if(ATNOTA==null)while(c.length&&!busy&&!nt.value.trim()&&!out.querySelector("button")){var t=c[0];ATNOTA=t;nt.value=t;ATAUTO=true;$("nb").click();
+  if(ATNOTA!=null)break;c=atCola()}
+ var hechas=ATHECHAS.splice(0),noent=ATNOENT.splice(0),ojo=ATOJO.splice(0),resto=atCola().length,
+  m=hechas.length?(hechas.length===1?"Guardé lo que le dijiste al atajo: \""+hechas[0].slice(0,120)+"\".":"Guardé "+hechas.length+" cosas que le dijiste al atajo."):"";
+ if(ojo.length)m+=(m?" ":"")+"⚠️ Ojo: "+ojo.map(function(q){return q.replace(/\s*¿[^?]*\?\s*$/,"")}).join(" ")+" Si está mal, tocá Deshacer o decile a Petaca \"me equivoqué, eran…\".";
  if(noent.length)m+=(m?" ":"")+"No entendí "+noent.map(function(t){return"\""+t.slice(0,60)+"\""}).join(", ")+": escribilo en Contale con más detalle.";
- if(ATNOTA!=null){var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
-  m+=(m?" ":"")+"Revisá la nota del atajo y tocá Guardar o Descartar."+(resto>1?" Después te muestro "+(resto===2?"la otra":"las otras "+(resto-1))+".":"")}
- else if(resto)m+=(m?" ":"")+(resto===1?"Tenés una nota del atajo esperando":"Tenés "+resto+" notas del atajo esperando")+": cuando termines la que estás escribiendo en Contale, te la"+(resto===1?"":"s")+" muestro.";
+ if(ATNOTA!=null){
+  if(busy)m+=(m?" ":"")+"Estoy entendiendo lo que le dijiste al atajo…";
+  else{var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
+   m+=(m?" ":"")+"No pude usar la IA: revisá la nota del atajo y tocá Guardar o Descartar."+(resto>1?" Después sigo con "+(resto===2?"la otra":"las otras "+(resto-1))+".":"")}}
+ else if(resto)m+=(m?" ":"")+(resto===1?"Tenés una nota del atajo esperando":"Tenés "+resto+" notas del atajo esperando")+": cuando termines la que estás escribiendo en Contale, la"+(resto===1?"":"s")+" guardo.";
  return m}
-// La nota del atajo que estaba en Contale ya se guardó, se descartó o no se entendió (ATULT dice cuál): sale de la cola y pasa
-// la siguiente.
-// Las que no se entendieron se juntan en ATNOENT para avisarlas.
-var ATULT="",ATNOENT=[];
-function atajoFin(r){if(ATNOTA==null)return;var c=atCola(),i=c.indexOf(ATNOTA);if(i>=0)c.splice(i,1);atCola(c);if(r==="vacio"||r==="error")ATNOENT.push(ATNOTA);ATNOTA=null;ATULT=r||"";
+// La nota del atajo que estaba en Contale ya se guardó, se descartó o no se entendió: sale de la cola y pasa la siguiente.
+// Para el aviso se juntan las que se guardaron solas (ATHECHAS), las que no se entendieron (ATNOENT) y los montos raros (ATOJO).
+// ATSOLA: el guardado lo hizo el atajo, no vos tocando Guardar.
+var ATHECHAS=[],ATNOENT=[],ATOJO=[],ATSOLA=false;
+function atajoFin(r){if(ATNOTA==null)return;var c=atCola(),i=c.indexOf(ATNOTA);if(i>=0)c.splice(i,1);atCola(c);
+ if(r==="vacio"||r==="error")ATNOENT.push(ATNOTA);else if(r==="guardo"&&ATSOLA)ATHECHAS.push(ATNOTA);ATNOTA=null;
  setTimeout(function(){var m=atajoNota();if(m)toast(m)},0)}
 // Si vaciás el cuadro de Contale, las notas del atajo que esperaban pasan.
 $("nt").addEventListener("input",function(){if(!this.value.trim()&&ATNOTA==null&&!$("nr").querySelector("button"))setTimeout(function(){var m=atajoNota();if(m)toast(m)},0)});

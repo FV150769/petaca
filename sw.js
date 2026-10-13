@@ -5,7 +5,7 @@
 //   del celular al instante. Cada versión nueva de este archivo arranca con un depósito limpio.
 // - Supabase, el dólar y todo lo demás van siempre a la red (nunca se guardan).
 // - Si el navegador no deja guardar (navegación privada, sin espacio), igual se instala: todo va a la red y los avisos andan.
-const VERSION = "v80";
+const VERSION = "v81";
 const CACHE = "petaca-" + VERSION;
 const BASE = new URL("./", self.location).href;
 

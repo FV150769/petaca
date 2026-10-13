@@ -13,10 +13,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#12A150">
-<script src="tema.js?v=80"></script>
+<script src="tema.js?v=81"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="styles.css?v=80">
+<link rel="stylesheet" href="styles.css?v=81">
 </head>
 <body class="auth">
 <div class="cancha" aria-hidden="true"><i class="area ar"></i><i class="chica ar"></i><i class="arco ar"></i><i class="area ab"></i><i class="chica ab"></i><i class="arco ab"></i><i class="esq e1"></i><i class="esq e2"></i><i class="esq e3"></i><i class="esq e4"></i><i class="bandera b1"></i><i class="bandera b2"></i><span class="pelota">⚽</span></div>
@@ -390,8 +390,9 @@
 <li><i>"¿Cuánto me queda?"</i> o <i>"¿cuánto gasté?"</i> → te dice tu plata.</li>
 <li><i>"¿Qué tengo mañana?"</i> → te lee tu agenda de hoy y mañana.</li>
 <li><i>"Borrá lo último"</i> → deshace lo último que le dijiste.</li>
+<li><i>"Me equivoqué, el de farmacia eran 6 mil"</i> o <i>"borrá el gasto del kiosco"</i> → lo corrige.</li>
 </ul>
-<p class="sem">Lo que le contás entra solo la próxima vez que abras Petaca. Si algo no queda claro, o un monto parece mal (mucho más grande que lo de siempre, o repetido), te lo muestro para que lo confirmes. Si Siri escuchó mal, decile <i>"borrá lo último"</i>.</p>
+<p class="sem">Todo lo que le contás se guarda solo la próxima vez que abras Petaca, con <b>Deshacer</b> en el aviso. Si un monto parece mal (mucho más grande que lo de siempre, o repetido), te lo marco con ⚠️. Si Siri escuchó mal, decile <i>"borrá lo último"</i> antes de abrir la app, o después <i>"me equivoqué, eran…"</i>.</p>
 
 <details class="calcomo"><summary>¿No anda? Fijate acá</summary>
 <ul class="sem tgp">
@@ -441,6 +442,6 @@
 </main>
 <div id="lock" class="lock" role="dialog" aria-modal="true" aria-labelledby="lockt" hidden></div>
 <script src="vendor/supabase-2.117.1.js"></script>
-<script src="app.js?v=80"></script>
+<script src="app.js?v=81"></script>
 </body>
 </html>
