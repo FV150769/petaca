@@ -13,10 +13,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#12A150">
-<script src="tema.js?v=78"></script>
+<script src="tema.js?v=79"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="styles.css?v=78">
+<link rel="stylesheet" href="styles.css?v=79">
 </head>
 <body class="auth">
 <div class="cancha" aria-hidden="true"><i class="area ar"></i><i class="chica ar"></i><i class="arco ar"></i><i class="area ab"></i><i class="chica ab"></i><i class="arco ab"></i><i class="esq e1"></i><i class="esq e2"></i><i class="esq e3"></i><i class="esq e4"></i><i class="bandera b1"></i><i class="bandera b2"></i><span class="pelota">⚽</span></div>
@@ -338,24 +338,61 @@
 <p class="sem" id="tgam"></p>
 </details></section>
 <section class="goal" data-c="atajo" data-name="Atajos del iPhone"><details id="atd"><summary>Atajos del iPhone</summary>
-<p class="sem" style="margin-top:0">Hablale a Petaca con Siri, sin abrirla: "gasté 8 mil en farmacia", "¿cuánto me queda?", "¿qué tengo mañana?" o "borrá lo último". Lo que le contás entra solo la próxima vez que abras Petaca; si algo no queda claro, te lo muestro para que lo confirmes.</p>
-<p class="sem" id="atm"></p>
-<div class="add"><button id="atc">Crear clave</button><button class="x" id="atx" hidden>Desvincular</button></div>
-<div id="atk" hidden>
-<p class="sem"><b>Tu dirección personal</b> (se muestra una sola vez y tiene tu clave adentro: no la compartas con nadie). Copiala y seguí los pasos de abajo:</p>
-<div class="add"><input id="atki" readonly autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Tu dirección personal para el atajo"><button type="button" id="atkc">📋 Copiar</button></div>
-</div>
+<p class="sem" style="margin-top:0">Hablale a Petaca con Siri, sin abrir la app: <i>"gasté 8 mil en farmacia"</i>, <i>"¿cuánto me queda?"</i>, <i>"¿qué tengo mañana?"</i>. Se arma una sola vez y lleva unos 5 minutos.</p>
 <p class="sem" id="atl" hidden></p>
-<details class="calcomo" id="atp"><summary>¿Cómo armo el atajo? (4 pasos, una sola vez)</summary>
-<p class="sem">En el iPhone, abrí la app <b>Atajos</b> → <b>＋</b> (arriba a la derecha) → arriba tocá el nombre y poné <b>Petaca</b>. Después agregá estas 4 acciones buscándolas por nombre:</p>
+
+<h3 class="tgh3">Paso 1 · Tu dirección personal</h3>
+<p class="sem" id="atm"></p>
+<div class="add"><button id="atc">Crear mi dirección</button><button class="x" id="atx" hidden>Desvincular</button></div>
+<div id="atk" hidden>
+<p class="sem">Esta es tu dirección. <b>Se muestra una sola vez</b> y tiene tu clave adentro: no la compartas con nadie.</p>
+<div class="add"><input id="atki" readonly autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Tu dirección personal para el atajo"><button type="button" id="atkc">📋 Copiar</button><button type="button" class="x" id="atkp">▶ Probar</button></div>
+<p class="sem" id="atpr" aria-live="polite"></p>
+</div>
+
+<h3 class="tgh3">Paso 2 · Armá el atajo en el iPhone</h3>
 <ol class="sem tgp">
-<li><b>Pedir entrada</b> → tocá "Solicitud" y escribí: <i>¿Qué le contás a Petaca?</i></li>
-<li><b>Codificar URL</b> (se conecta solo con lo del paso 1).</li>
-<li><b>Obtener contenido de URL</b> → tocá "URL", pegá <b>tu dirección personal</b> y, sin dejar espacio, al final tocá <b>URL codificada</b> en la barra de arriba del teclado.</li>
-<li><b>Mostrar resultado</b> (se conecta solo).</li>
+<li>Abrí la app <b>Atajos</b> (Shortcuts) → abajo, pestaña <b>Atajos</b> → <b>＋</b> arriba a la derecha.</li>
+<li>Tocá el nombre de arriba → <b>Renombrar</b> (Rename) → escribí <b>Petaca</b>.</li>
+<li>Agregá estas 4 acciones <b>en este orden</b>. Para cada una, tocá el buscador de abajo y escribí la palabra que dice <i>"buscá"</i>:</li>
 </ol>
-<p class="sem">¡Listo! Decí <b>"Oye Siri, Petaca"</b>, contale lo que quieras y te contesta en voz alta. También lo podés tocar desde la app Atajos o ponerlo en la pantalla de inicio (mantené apretado el atajo → Compartir → Agregar a pantalla de inicio).</p>
-<p class="sem"><b>¿Y si Siri entiende mal?</b> Petaca te repite lo que escuchó: si está mal, decile <b>"borrá lo último"</b>. Al abrir la app, un monto que parece mal (mucho más grande que lo de siempre, o repetido ese día) te lo pregunto antes de sumarlo.</p>
+<ol class="atpasos">
+<li><b>Solicitar entrada</b> <small>Ask for Input · buscá "entrada"</small>
+<span>Tocá <b>Solicitud</b> (Prompt) y escribí: <i>¿Qué le contás a Petaca?</i></span></li>
+<li><b>Codificar URL</b> <small>URL Encode · buscá "codificar"</small>
+<span>No toques nada: se conecta sola.</span></li>
+<li class="clave"><b>Obtener contenido de la URL</b> <small>Get Contents of URL · buscá "contenido"</small>
+<span>⚠️ <b>El paso importante.</b> Tocá el campo de la URL y <b>pegá tu dirección</b> (la del Paso 1). Si ya aparece la variable <b>URL codificada</b> (URL Encoded Text), tu dirección va <b>adelante</b>, pegada. Tiene que quedar así:</span>
+<code class="atmock">https://…/atajo?k=pt_…&amp;t=<i>URL codificada</i></code>
+<span>Si la variable no está, con el cursor al final de tu dirección tocala en la barra de arriba del teclado. No toques la flechita ›.</span></li>
+<li><b>Mostrar resultado</b> <small>Show Result · buscá "resultado"</small>
+<span>No toques nada.</span></li>
+</ol>
+<p class="sem">Tocá <b>OK</b> (Done) arriba a la derecha.</p>
+
+<h3 class="tgh3">Paso 3 · Probalo</h3>
+<p class="sem">Tocá el atajo y escribí <i>¿cuánto me queda?</i> Si te contesta, ¡listo! Después probalo con la voz: <b>"Oye Siri, Petaca"</b> (o "Hey Siri, Petaca").</p>
+
+<h3 class="tgh3">Qué le podés decir</h3>
+<ul class="sem tgp">
+<li><i>"Gasté 8 mil en farmacia con efectivo"</i> → lo anota.</li>
+<li><i>"Me pagaron 300 mil"</i> → anota el ingreso y separa tu % de ahorro.</li>
+<li><i>"Mañana a las 10 dentista"</i> → lo agenda.</li>
+<li><i>"¿Cuánto me queda?"</i> o <i>"¿cuánto gasté?"</i> → te dice tu plata.</li>
+<li><i>"¿Qué tengo mañana?"</i> → te lee tu agenda de hoy y mañana.</li>
+<li><i>"Borrá lo último"</i> → deshace lo último que le dijiste.</li>
+</ul>
+<p class="sem">Lo que le contás entra solo la próxima vez que abras Petaca. Si algo no queda claro, o un monto parece mal (mucho más grande que lo de siempre, o repetido), te lo muestro para que lo confirmes. Si Siri escuchó mal, decile <i>"borrá lo último"</i>.</p>
+
+<details class="calcomo"><summary>¿No anda? Fijate acá</summary>
+<ul class="sem tgp">
+<li><b>"Esa clave ya no anda"</b>: creaste una dirección nueva. Copiala y reemplazá la vieja en el atajo.</li>
+<li><b>"La clave no es válida"</b> o <b>"Falta tu clave"</b>: la dirección quedó cortada. Copiala de nuevo: tiene que terminar en <code>&amp;t=</code>.</li>
+<li><b>"No te escuché"</b>: la variable <b>URL codificada</b> no quedó al final de la dirección (paso 3 de las acciones).</li>
+<li><b>No aparece la variable</b> arriba del teclado: mantené apretado al final de la dirección → <b>Seleccionar variable</b> (Select Variable) → tocá la acción Codificar URL.</li>
+<li><b>Un texto en inglés o con números raros</b> (404, 401): Petaca no está lista del lado del servidor. Tocá ▶ Probar en el Paso 1: si también falla ahí, el problema no es tu atajo.</li>
+<li><b>Perdiste tu dirección</b>: tocá "Crear una dirección nueva" y pegala en el atajo (la vieja deja de andar).</li>
+</ul>
 </details>
 </details></section>
 <section class="goal" data-c="priv" data-name="Pantalla y bloqueo"><details id="prd"><summary>Pantalla y bloqueo</summary>
@@ -394,6 +431,6 @@
 </main>
 <div id="lock" class="lock" role="dialog" aria-modal="true" aria-labelledby="lockt" hidden></div>
 <script src="vendor/supabase-2.117.1.js"></script>
-<script src="app.js?v=78"></script>
+<script src="app.js?v=79"></script>
 </body>
 </html>

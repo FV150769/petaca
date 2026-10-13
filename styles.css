@@ -422,6 +422,15 @@ body.sinhints .hint{display:none}
 .calprov{margin:6px 0 0 4px;padding:2px 0 2px 12px;border-left:3px solid var(--line)}
 .calprov>summary{font-size:15px}
 .calprov ol{margin-top:4px}
+/* Atajos del iPhone: las 4 acciones del atajo, numeradas como tarjetas */
+.atpasos{list-style:none;margin:10px 0 0;padding:0;counter-reset:at;display:grid;gap:8px}
+.atpasos li{counter-increment:at;position:relative;padding:10px 12px 10px 46px;border:1px solid var(--line);border-radius:var(--radio-s);background:var(--kpi);font-size:14px;color:var(--ink)}
+.atpasos li::before{content:counter(at);position:absolute;left:12px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font:700 14px/24px var(--f-txt);text-align:center}
+.atpasos li.clave{border:2px solid var(--acc)}
+.atpasos small{display:block;color:var(--mute);font-size:12.5px}
+.atpasos span{display:block;margin-top:4px;color:var(--mute)}
+.atmock{display:block;margin:6px 0 2px;padding:8px 10px;border-radius:8px;background:var(--panel);border:1px dashed var(--line);font-size:12.5px;overflow-wrap:anywhere;color:var(--ink)}
+.atmock i{font-style:normal;padding:1px 6px;border-radius:6px;background:var(--acc);color:#fff;white-space:nowrap}
 .calfile{position:relative;display:inline-flex;margin:10px 0 0}
 .calfile input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
 .calfile span{display:inline-flex;align-items:center;min-height:44px;padding:8px 18px;background:var(--panel);color:var(--ink);border:var(--borde);border-radius:999px;box-shadow:0 3px 0 var(--sombra-c);font:700 15px/1 var(--f-cond);letter-spacing:.05em;text-transform:uppercase;pointer-events:none}

@@ -27,8 +27,9 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 }
 // Al Atajo se le contesta en texto: lo que se muestra (o lee Siri) es la respuesta entera, sin pasos de más.
+// Con CORS, así el botón "▶ Probar" de la página también puede leerla.
 function texto(t: string, status = 200) {
-  return new Response(t, { status, headers: { "Content-Type": "text/plain; charset=utf-8" } });
+  return new Response(t, { status, headers: { ...CORS, "Content-Type": "text/plain; charset=utf-8" } });
 }
 
 function b64u(a: Uint8Array) {

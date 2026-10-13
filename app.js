@@ -55,7 +55,7 @@ function vestir(){var a=document.body.classList.contains("auth"),e=EQS[a?"":EQUI
    cr.appendChild(document.createTextNode(", por "+f.a+" ("));var l2=document.createElement("a");l2.href=f.lu;l2.target="_blank";l2.rel="noopener";l2.textContent=f.l;cr.appendChild(l2);cr.appendChild(document.createTextNode("), vía Wikimedia Commons."))}}}
 var KEY="panel-local-v1",L={events:[],expenses:[],saves:[],hidden:[],skip:[],ing:[],mv:[],inv:[],bal:{},fxAuto:true};
 try{var s=localStorage.getItem(KEY);if(s)L=JSON.parse(s);if(!L.saves)L.saves=[];if(!L.hidden)L.hidden=[];if(!L.skip)L.skip=[];if(!L.ing)L.ing=[];if(!L.bal)L.bal={};if(!L.rskip)L.rskip=[];if(!L.calno)L.calno=[];if(!L.mv)L.mv=[];if(!L.inv)L.inv=[];if(!L.fijos)L.fijos=[];if(L.fxAuto==null)L.fxAuto=true}catch(e){}
-var DOC=null,VER="v78";
+var DOC=null,VER="v79";
 var SUPABASE_URL="https://jrsjnmutdnzuxqimroaa.supabase.co";
 var SUPABASE_KEY="sb_publishable__BLdyenbNV0eqb-5MdL2Cw_48V2WwDA";
 var SB=null,UID=null;
@@ -2190,20 +2190,24 @@ async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE||LOCKED)return;ATRAE=tr
  catch(e){reportar("Atajo: no pude traer la bandeja",e&&(e.stack||e.message))}finally{ATRAE=false}}
 async function atajoFn(body){var r=await SB.functions.invoke("atajo",{body:body});if(r.error){var t=r.error.message;try{var b=await r.error.context.json();if(b&&b.error)t=b.error}catch(e){}throw new Error(t)}return r.data||{}}
 async function atajoUI(){var m=$("atm");
- if(ATAJO_LINK){var l=$("atl");l.hidden=false;l.innerHTML="";var a=el("a","btnlink","📲 Instalar el atajo");a.href=ATAJO_LINK;a.target="_blank";a.rel="noopener";l.appendChild(a);l.appendChild(document.createTextNode(" Te pide la clave al instalarlo."))}
+ if(ATAJO_LINK){var l=$("atl");l.hidden=false;l.innerHTML="";var a=el("a","btnlink","📲 Instalar el atajo");a.href=ATAJO_LINK;a.target="_blank";a.rel="noopener";l.appendChild(a);l.appendChild(document.createTextNode(" Te pide tu dirección personal al instalarlo (Paso 1): así te salteás el Paso 2."))}
  if(!SB||!UID){m.textContent="Iniciá sesión primero.";return}
  m.textContent="Revisando…";try{var d=await atajoFn({accion:"estado"});
-  m.textContent=d.vinculado?"✅ Tenés una clave activa"+(d.usado?" (último uso: "+new Date(d.usado).toLocaleString("es-AR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+")":" (todavía sin usar)")+".":"Creá tu clave para conectar el atajo con tu cuenta.";
-  $("atc").textContent=d.vinculado?"Crear una clave nueva":"Crear clave";$("atx").hidden=!d.vinculado}
- catch(e){m.textContent="No pude revisar tu clave: "+(e&&e.message||e)}}
+  if(!$("atki").value)m.textContent=d.vinculado?"✅ Ya tenés tu dirección"+(d.usado?" (el atajo la usó por última vez el "+new Date(d.usado).toLocaleString("es-AR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+")":" (el atajo todavía no la usó)")+". Si la perdiste, creá una nueva.":"Tocá el botón: te armo tu dirección para pegar en el atajo.";
+  $("atc").textContent=d.vinculado?"Crear una dirección nueva":"Crear mi dirección";$("atx").hidden=!d.vinculado}
+ catch(e){m.textContent="No pude revisar tu dirección: "+(e&&e.message||e)}}
 $("atd").addEventListener("toggle",function(){if($("atd").open)atajoUI()});
 $("atc").onclick=async function(){var m=$("atm"),b=this;if(!SB||!UID)return(m.textContent="Iniciá sesión primero.");
- if(!$("atx").hidden&&!confirm("La clave que tenés ahora deja de andar y vas a tener que pegar la nueva en el atajo. ¿Crear una nueva?"))return;
- b.disabled=true;m.textContent="Creando tu clave…";
- try{var d=await atajoFn({accion:"crear"});$("atki").value=SUPABASE_URL+"/functions/v1/atajo?k="+d.clave+"&t=";$("atp").open=true;$("atk").hidden=false;$("atx").hidden=false;b.textContent="Crear una clave nueva";
-  await push().catch(function(){});m.textContent="✅ Listo. Copiá tu dirección y seguí los 4 pasos de abajo."}
- catch(e){m.textContent="No pude crear la clave: "+(e&&e.message||e)}finally{b.disabled=false}};
-$("atx").onclick=async function(){if(!confirm("El atajo deja de andar hasta que crees una clave nueva. ¿Desvincular?"))return;
+ if(!$("atx").hidden&&!confirm("La dirección que tenés ahora deja de andar y vas a tener que pegar la nueva en el atajo. ¿Crear una nueva?"))return;
+ b.disabled=true;m.textContent="Creando tu dirección…";$("atpr").textContent="";
+ try{var d=await atajoFn({accion:"crear"});$("atki").value=SUPABASE_URL+"/functions/v1/atajo?k="+d.clave+"&t=";$("atk").hidden=false;$("atx").hidden=false;b.textContent="Crear una dirección nueva";
+  await push().catch(function(){});m.textContent="✅ Listo. Copiala y seguí con el Paso 2."}
+ catch(e){m.textContent="No pude crear tu dirección: "+(e&&e.message||e)}finally{b.disabled=false}};
+// Probar la dirección desde acá, antes de armar el atajo: si contesta, del lado de Petaca está todo bien.
+$("atkp").onclick=async function(){var p=$("atpr"),u=$("atki").value;if(!u)return;p.textContent="Probando…";
+ try{var r=await fetch(u+encodeURIComponent("¿cuánto me queda?")),t=await r.text();p.textContent=(r.ok?"✅ Anda. Petaca contestó: ":"❌ No anda ("+r.status+"): ")+t.slice(0,300)}
+ catch(e){p.textContent="❌ No pude conectarme con Petaca. Revisá tu conexión y probá de nuevo."}};
+$("atx").onclick=async function(){if(!confirm("El atajo deja de andar hasta que crees una dirección nueva. ¿Desvincular?"))return;
  try{await atajoFn({accion:"quitar"});$("atk").hidden=true;$("atki").value="";await atajoUI()}catch(e){$("atm").textContent="No pude desvincularlo: "+(e&&e.message||e)}};
 function copiar(i,b){var v=$(i).value;if(!v)return;var fin=function(){if(!b.dataset.t)b.dataset.t=b.textContent;b.textContent="✅ Copiado";clearTimeout(b._t);b._t=setTimeout(function(){b.textContent=b.dataset.t},1500)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(fin,function(){$(i).select()});else{$(i).select();try{document.execCommand("copy");fin()}catch(e){}}}
