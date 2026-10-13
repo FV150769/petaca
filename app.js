@@ -55,7 +55,7 @@ function vestir(){var a=document.body.classList.contains("auth"),e=EQS[a?"":EQUI
    cr.appendChild(document.createTextNode(", por "+f.a+" ("));var l2=document.createElement("a");l2.href=f.lu;l2.target="_blank";l2.rel="noopener";l2.textContent=f.l;cr.appendChild(l2);cr.appendChild(document.createTextNode("), vía Wikimedia Commons."))}}}
 var KEY="panel-local-v1",L={events:[],expenses:[],saves:[],hidden:[],skip:[],ing:[],mv:[],inv:[],bal:{},fxAuto:true};
 try{var s=localStorage.getItem(KEY);if(s)L=JSON.parse(s);if(!L.saves)L.saves=[];if(!L.hidden)L.hidden=[];if(!L.skip)L.skip=[];if(!L.ing)L.ing=[];if(!L.bal)L.bal={};if(!L.rskip)L.rskip=[];if(!L.calno)L.calno=[];if(!L.mv)L.mv=[];if(!L.inv)L.inv=[];if(!L.fijos)L.fijos=[];if(L.fxAuto==null)L.fxAuto=true}catch(e){}
-var DOC=null,VER="v79";
+var DOC=null,VER="v80";
 var SUPABASE_URL="https://jrsjnmutdnzuxqimroaa.supabase.co";
 var SUPABASE_KEY="sb_publishable__BLdyenbNV0eqb-5MdL2Cw_48V2WwDA";
 var SB=null,UID=null;
@@ -1000,7 +1000,8 @@ $("nb").onclick=async function(){
   var RU=[];(r.rutinas||[]).forEach(function(u){if(!u||!u.titulo)return;var h=hhmm(u.hora),ds=ordDias(diasDe(u.dias!=null?u.dias:u.dia));if(!h||!ds.length)return;
    RU.push({id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),ds:ds,d:ds[0],t:h,t2:hhmm(u.hasta),x:String(u.titulo),from:today,to:""})});
   out.innerHTML="";if(nota)out.appendChild(el("p","sem",nota));
-  if(!G.length&&!E.length&&!IN.length&&!MV.length&&!CR.length&&A==null&&!Cn.length&&!CF.length&&!NS.length&&!RU.length&&FX==null&&!AJC.length&&!AJP.length&&!AJO.length&&!SPo.length&&!RSo.length){out.textContent="No encontré gastos, eventos, ingresos, ajustes ni nada para corregir en esa nota. Probá con más detalle.";medir("vacio");return}
+  if(!G.length&&!E.length&&!IN.length&&!MV.length&&!CR.length&&A==null&&!Cn.length&&!CF.length&&!NS.length&&!RU.length&&FX==null&&!AJC.length&&!AJP.length&&!AJO.length&&!SPo.length&&!RSo.length){out.textContent="No encontré gastos, eventos, ingresos, ajustes ni nada para corregir en esa nota. Probá con más detalle.";medir("vacio");
+   if(ATNOTA!=null){out.textContent="No entendí lo que le dijiste al atajo: \""+txt+"\". Si querés, escribilo acá con más detalle.";$("nt").value="";atajoFin("vacio")}return}
   // Vista previa editable: cada ítem se puede corregir (✎) o quitar (×) antes de guardar.
   var AA=A!=null?[{m:A}]:[],FF=FX!=null?[{v:FX}]:[],NSo=NS.map(function(d){return{f:d}});
   var CAT=Object.keys(BUDGET).concat(AJC.filter(function(o){return o.tp==="n"}).map(function(o){return o.n})).map(function(c){return[c,c]}),DIA=DN.map(function(n,i){return[i,n]}),DIR=[["e","De transferencia a efectivo"],["t","De efectivo a transferencia"]];
@@ -1064,7 +1065,7 @@ $("nb").onclick=async function(){
     if(k.f){var e=el("button","x","✎");e.setAttribute("aria-label","Corregir");e.title="Corregir";e.onclick=function(){editor(k,o,row)};bt.appendChild(e)}
     var x=el("button","x","×");x.setAttribute("aria-label","Quitar");x.title="Quitar";x.onclick=function(){k.a.splice(k.a.indexOf(o),1);if(MEDN)MEDN.quitados=Math.min(100,MEDN.quitados+1);draw()};bt.appendChild(x);
     row.appendChild(bt);out.appendChild(row);if(k.x)k.x(o,row)})});
-   if(!n){out.appendChild(el("p","sem","No queda nada para guardar."));var cl=el("button","x","Cerrar");cl.onclick=function(){out.innerHTML=""};medir("descarto");out.appendChild(cl);return}
+   if(!n){out.appendChild(el("p","sem","No queda nada para guardar."));var cl=el("button","x","Cerrar");cl.onclick=function(){out.innerHTML=""};medir("descarto");out.appendChild(cl);if(ATNOTA!=null){$("nt").value="";atajoFin("descarto")}return}
    var yes=el("button","","Guardar en el panel"),no=el("button","x","Descartar");
    yes.style.marginTop="10px";
    yes.onclick=function(){
@@ -1087,18 +1088,19 @@ $("nb").onclick=async function(){
     if(FF.length){L.fx=FF[0].v;L.fxAuto=false}if(AA.length)L.saves.push({f:today,m:AA[0].m});
     SPo.forEach(function(s){if(s.aj)ajustarSaldo(s.aj,s.me);if(s.a==="inversiones")invertir(s.ars,s.me);else pasarAhorro(s.ars,s.me)});RSo.forEach(function(s){invertir(-s.ars,s.me)});$("nt").value="";out.innerHTML="";save();render();
     var nc=CRX.length+CRI.length+CRM.length+CRE.length+AJC.length+AJP.length+AJO.length;
-    medir("guardo");
+    medir("guardo");atajoFin("guardo");
     if(RSo.length&&n===1)toast(invMsg({ars:-RSo[0].ars}));else if(SPo.length&&n===1&&SPo[0].a==="inversiones")toast(invMsg(SPo[0]));else
     if(SPo.length&&n===SPo.length)toast("Listo: pasé "+money(SPo[0].ars)+" al ahorro (≈ "+usd(SPo[0].ars/L.fx)+"). Te quedan "+mny(diaVal())+" en "+ACC[0][0]+".");else
     toast(nc?"Listo, "+(nc===1?"corregí lo que me dijiste":"corregí "+nc+" cosas")+(n>nc?" y guardé el resto":"")+".":"Guardé lo de tu nota.")};
-   no.onclick=function(){out.innerHTML="";medir("descarto")};
+   // Descartar deja tu texto para corregirlo; si era una nota del atajo, se va del todo y pasa la siguiente.
+   no.onclick=function(){out.innerHTML="";medir("descarto");if(ATNOTA!=null){$("nt").value="";atajoFin("descarto")}};
    out.appendChild(yes);out.appendChild(no);return yes}
   var si=draw();
   // Del atajo del iPhone: lo que se entendió al instante (sin IA) y sin dudas se guarda solo; el aviso tiene Deshacer.
   // Si hizo falta la IA o algo parece mal (monto raro o repetido), queda la vista previa para confirmarlo.
   if(auto&&si&&via==="rapida"&&!SPo.length&&!RSo.length&&G.every(function(g){return!dudoso("g",g.m,g.f,g.c)})&&IN.every(function(i){return!dudoso("i",i.v,i.f)})){
    IN.forEach(function(i){if(i.p==null)i.p=AHO});si.onclick()}
- }catch(e){medir("error");out.textContent="No pude procesar la nota: "+(e&&(e.message||e.code)||"error");reportar("No pude procesar la nota: "+(e&&(e.message||e.code)||"error"),e&&e.stack)}
+ }catch(e){medir("error");out.textContent="No pude procesar la nota: "+(e&&(e.message||e.code)||"error");if(ATNOTA!=null){out.textContent+=". Era lo que le dijiste al atajo: \""+txt+"\".";$("nt").value="";atajoFin("error")}reportar("No pude procesar la nota: "+(e&&(e.message||e.code)||"error"),e&&e.stack)}
  finally{busy=false;$("nb").disabled=false;esp.forEach(clearTimeout)}
 };
 
@@ -2166,7 +2168,7 @@ function resumenAtajo(){try{var by={},tot=0,ag={},n=14;
 // Lo que se borra de la bandeja es lo que se suma: si dos dispositivos se abren a la vez, cada cosa entra en uno solo.
 async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE||LOCKED)return;ATRAE=true;
  try{var r=await SB.from("atajo_bandeja").delete().gt("id",0).select("id,tipo,datos");
-  if(r.error||!r.data||!r.data.length){if(RESHOY!==today)push().catch(function(){});return}
+  if(r.error||!r.data||!r.data.length){if(RESHOY!==today)push().catch(function(){});var m0=atajoNota();if(m0)toast(m0);return}
   var G=[],I=[],N=[],ok=/^\d{4}-\d{2}-\d{2}$/,NO="\n\nSi tocás Cancelar, lo dejo escrito en Contale para que lo corrijas.";
   function cuando(f){return f!==today?" el "+fd(f):""}
   r.data.sort(function(a,b){return a.id-b.id}).forEach(function(x){var d=x.datos||{},f=ok.test(d.f)?d.f:today;
@@ -2180,14 +2182,35 @@ async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE||LOCKED)return;ATRAE=tr
   if(G.length||I.length){save();render()}
   var q=[];if(G.length)q.push(G.length===1?"un gasto de "+money(G[0].m)+" en "+G[0].c:cant(G.length,"gasto","gastos"));if(I.length)q.push(I.length===1?"un ingreso de "+money(I[0].v):cant(I.length,"ingreso","ingresos"));
   var msg=q.length?"Del atajo del iPhone sumé "+q.join(" y ")+".":"";
-  if(N.length){var nt=$("nt"),out=$("nr"),ocupado=busy||nt.value.trim()||out.querySelector("button"),dicho=N.join(". ");nt.value=(nt.value.trim()?nt.value.trim()+". ":"")+dicho;
-   if(!ocupado){ATAUTO=true;$("nb").click()}
-   // Si se guardó sola, el cuadro queda vacío; si no, la vista previa espera que la confirmes.
-   if(!ocupado&&!nt.value.trim())msg+=(msg?" ":"")+"Guardé lo que le dijiste al atajo: \""+dicho.slice(0,120)+"\".";
-   else{var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
-    msg+=(msg?" ":"")+(N.length===1?"Te traje una nota del atajo: ":"Te traje "+N.length+" notas del atajo: ")+(ocupado?"están en Contale, tocá Entender nota.":"revisala y tocá Guardar.")}}
+  if(N.length)atCola(atCola().concat(N));
+  var mn=atajoNota();if(mn)msg+=(msg?" ":"")+mn;
   if(msg)toast(msg)}
  catch(e){reportar("Atajo: no pude traer la bandeja",e&&(e.stack||e.message))}finally{ATRAE=false}}
+// Las notas del atajo esperan su turno y pasan por Contale de a una, sin mezclarse entre ellas ni con lo que estás escribiendo
+// vos. Quedan guardadas en este dispositivo (atCola) hasta que se guardan o se descartan, así no se pierden si cerrás la app.
+// ATNOTA: la nota del atajo que está ahora en Contale (null si no hay ninguna).
+var ATNOTA=null;
+function atCola(v){var k=KEY+"-atcola-"+UID;try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"[]")||[];if(v.length)localStorage.setItem(k,JSON.stringify(v));else localStorage.removeItem(k)}catch(e){}return[]}
+// Pasa las notas a Contale: las que se entienden sin dudas se guardan solas; la primera que necesita que la confirmes queda en la
+// vista previa y las demás esperan. Devuelve el aviso para mostrar.
+function atajoNota(){var nt=$("nt"),out=$("nr"),c=atCola(),hechas=[],noent=ATNOENT.splice(0);if(!UID||LOCKED||ATNOTA!=null||!c.length&&!noent.length)return"";
+ while(c.length&&!busy&&!nt.value.trim()&&!out.querySelector("button")){var t=c[0];ATNOTA=t;nt.value=t;ATAUTO=true;$("nb").click();
+  if(ATNOTA!=null)break;if(ATULT==="guardo")hechas.push(t);c=atCola()}
+ noent=noent.concat(ATNOENT.splice(0));
+ var m=hechas.length?(hechas.length===1?"Guardé lo que le dijiste al atajo: \""+hechas[0].slice(0,120)+"\".":"Guardé "+hechas.length+" cosas que le dijiste al atajo."):"",resto=atCola().length;
+ if(noent.length)m+=(m?" ":"")+"No entendí "+noent.map(function(t){return"\""+t.slice(0,60)+"\""}).join(", ")+": escribilo en Contale con más detalle.";
+ if(ATNOTA!=null){var g=document.querySelector('.grupo[data-g="nota"]');if(g)g.scrollIntoView({behavior:QUIETO?"auto":"smooth",block:"start"});
+  m+=(m?" ":"")+"Revisá la nota del atajo y tocá Guardar o Descartar."+(resto>1?" Después te muestro "+(resto===2?"la otra":"las otras "+(resto-1))+".":"")}
+ else if(resto)m+=(m?" ":"")+(resto===1?"Tenés una nota del atajo esperando":"Tenés "+resto+" notas del atajo esperando")+": cuando termines la que estás escribiendo en Contale, te la"+(resto===1?"":"s")+" muestro.";
+ return m}
+// La nota del atajo que estaba en Contale ya se guardó, se descartó o no se entendió (ATULT dice cuál): sale de la cola y pasa
+// la siguiente.
+// Las que no se entendieron se juntan en ATNOENT para avisarlas.
+var ATULT="",ATNOENT=[];
+function atajoFin(r){if(ATNOTA==null)return;var c=atCola(),i=c.indexOf(ATNOTA);if(i>=0)c.splice(i,1);atCola(c);if(r==="vacio"||r==="error")ATNOENT.push(ATNOTA);ATNOTA=null;ATULT=r||"";
+ setTimeout(function(){var m=atajoNota();if(m)toast(m)},0)}
+// Si vaciás el cuadro de Contale, las notas del atajo que esperaban pasan.
+$("nt").addEventListener("input",function(){if(!this.value.trim()&&ATNOTA==null&&!$("nr").querySelector("button"))setTimeout(function(){var m=atajoNota();if(m)toast(m)},0)});
 async function atajoFn(body){var r=await SB.functions.invoke("atajo",{body:body});if(r.error){var t=r.error.message;try{var b=await r.error.context.json();if(b&&b.error)t=b.error}catch(e){}throw new Error(t)}return r.data||{}}
 async function atajoUI(){var m=$("atm");
  if(ATAJO_LINK){var l=$("atl");l.hidden=false;l.innerHTML="";var a=el("a","btnlink","📲 Instalar el atajo");a.href=ATAJO_LINK;a.target="_blank";a.rel="noopener";l.appendChild(a);l.appendChild(document.createTextNode(" Te pide tu dirección personal al instalarlo (Paso 1): así te salteás el Paso 2."))}
