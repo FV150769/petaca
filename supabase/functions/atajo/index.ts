@@ -3,8 +3,9 @@
 // - Desde el panel, con la sesión iniciada: {accion:"crear"} arma una clave nueva para el Atajo (la anterior deja de andar) y
 //   la devuelve una sola vez; {accion:"quitar"} la borra; {accion:"estado"} dice si hay una y cuándo se usó.
 // - Desde el Atajo, con la clave en el encabezado "Clave": {accion:"gasto", monto, categoria?, detalle?, medio?},
-//   {accion:"ingreso", monto, medio?, ahorro?}, {accion:"nota", texto}, {accion:"queda"}, {accion:"agenda"} y
-//   {accion:"categorias"}. Contesta en texto, así el Atajo lo muestra y Siri lo lee en voz alta.
+//   {accion:"ingreso", monto, medio?, ahorro?}, {accion:"nota", texto}, {accion:"queda"}, {accion:"agenda"},
+//   {accion:"categorias"} y {accion:"deshacer"} (borra lo último que mandaste, si todavía no entró al panel).
+//   Contesta en texto, así el Atajo lo muestra y Siri lo lee en voz alta; repite lo que entendió, por si Siri escuchó mal.
 // Lo que se carga va a una bandeja (atajo_bandeja): la página lo suma al abrirse. Escribir directo en panel_state podría pisar
 // lo que el celular cargó sin conexión. "¿Cuánto me queda?" y la agenda salen del resumen que la página guarda al sincronizar
 // (data.res), más lo que todavía está en la bandeja.
@@ -164,10 +165,23 @@ async function atajo(clave: string, body: any) {
   if (accion === "categorias") return texto((cats.length ? cats : ["Otros"]).join("\n"));
   if (accion === "queda") return texto(quedaTxt(d.res, await bandeja(), aho, true) || "Todavía no sé cuánto te queda: abrí Petaca una vez y después preguntame.");
   if (accion === "agenda") return texto(agendaTxt(d.res));
+  // Si Siri escuchó mal: borra lo último que mandaste, mientras siga en la bandeja (si ya entró, se borra desde la app).
+  if (accion === "deshacer") {
+    const { data: u } = await sb.from("atajo_bandeja").select("id,tipo,datos").eq("user_id", uid)
+      .order("id", { ascending: false }).limit(1).maybeSingle();
+    const { data: b } = u ? await sb.from("atajo_bandeja").delete().eq("id", u.id).select("id") : { data: [] };
+    if (!u || !b?.length) {
+      return texto("No tengo nada para deshacer: lo último que mandaste ya entró a Petaca. Abrila y tocá Deshacer, o decile en Contale \"borrá el último gasto\".");
+    }
+    const x = u.datos ?? {};
+    const que = u.tipo === "gasto" ? "el gasto de " + plata(x.m) + (x.c ? " en " + x.c : "")
+      : u.tipo === "ingreso" ? "el ingreso de " + plata(x.v) : "la nota \"" + String(x.t ?? "").slice(0, 80) + "\"";
+    return texto("Listo, borré " + que + ".");
+  }
 
   // Lo que se carga: como mucho 30 cosas cada 10 minutos y 200 esperando en la bandeja.
   if (accion !== "gasto" && accion !== "ingreso" && accion !== "nota") {
-    return texto("No entendí qué querés hacer. Opciones: gasto, ingreso, nota, queda, agenda o categorias.", 400);
+    return texto("No entendí qué querés hacer. Opciones: gasto, ingreso, nota, queda, agenda, categorias o deshacer.", 400);
   }
   const { count: recientes } = await sb.from("atajo_bandeja").select("id", { count: "exact", head: true })
     .eq("user_id", uid).gt("creado", new Date(Date.now() - 10 * 60e3).toISOString());
@@ -197,7 +211,7 @@ async function atajo(clave: string, body: any) {
     const t = String(body.texto ?? "").replace(/\s+/g, " ").trim().slice(0, 500);
     if (!t) return texto("No me llegó la nota. Probá de nuevo.", 400);
     datos = { f, t };
-    ok = "Anotado ✅ Cuando abras Petaca te muestro cómo lo entendí para que lo confirmes.";
+    ok = "Anotado ✅ \"" + t + "\". Cuando abras Petaca lo confirmás.";
   }
   const { error } = await sb.from("atajo_bandeja").insert({ user_id: uid, tipo, datos });
   if (error) return texto("No pude guardarlo. Probá de nuevo en un rato.", 500);

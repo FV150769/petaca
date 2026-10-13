@@ -351,14 +351,15 @@
 <div class="add"><input id="atu" readonly autocomplete="off" spellcheck="false" aria-label="Dirección para el atajo"><button type="button" id="atuc">📋 Copiar</button></div>
 <ol class="sem tgp">
 <li>Atajos → <b>＋</b> → nombralo <b>Petaca</b> (así le decís "Oye Siri, Petaca").</li>
-<li>Agregá <b>Elegir del menú</b> con 5 opciones: <b>Contale</b>, <b>Gasto</b>, <b>Ingreso</b>, <b>¿Cuánto me queda?</b> y <b>Agenda</b>.</li>
+<li>Agregá <b>Elegir del menú</b> con 6 opciones: <b>Contale</b>, <b>Gasto</b>, <b>Ingreso</b>, <b>¿Cuánto me queda?</b>, <b>Agenda</b> y <b>Deshacer lo último</b>.</li>
 <li>En cada opción va un <b>Obtener contenido de URL</b> con la dirección de arriba. Tocá ▸ y poné <b>Método: POST</b>; en <b>Encabezados</b> agregá uno que se llame <b>Clave</b> con tu clave; en <b>Cuerpo de la solicitud: JSON</b>, los campos de cada opción. Armalo una vez y en las otras opciones usá <b>Duplicar</b>.</li>
 <li><b>Contale:</b> antes, <b>Dictar texto</b>. Campos: <code>accion</code> = nota, <code>texto</code> = Texto dictado.</li>
 <li><b>Gasto:</b> antes, <b>Pedir entrada</b> (Número, "¿Cuánto gastaste?"); después un <b>Obtener contenido de URL</b> con <code>accion</code> = categorias, <b>Dividir texto</b> por saltos de línea y <b>Elegir de la lista</b> ("¿En qué?"); y una <b>Lista</b> con Transferencia y Efectivo + <b>Elegir de la lista</b> ("¿Cómo pagaste?"). Campos: <code>accion</code> = gasto, <code>monto</code> = Entrada proporcionada, <code>categoria</code> = la categoría elegida, <code>medio</code> = el medio elegido. Si querés, sumá <code>detalle</code> con otro Pedir entrada (Texto).</li>
 <li><b>Ingreso:</b> <b>Pedir entrada</b> (Número, "¿Cuánto te entró?"), la Lista de medios y Elegir de la lista. Campos: <code>accion</code> = ingreso, <code>monto</code>, <code>medio</code>. Se separa tu % de ahorro de siempre (o mandá <code>ahorro</code> con otro %).</li>
-<li><b>¿Cuánto me queda?</b> y <b>Agenda:</b> solo el campo <code>accion</code> = queda o agenda.</li>
+<li><b>¿Cuánto me queda?</b>, <b>Agenda</b> y <b>Deshacer lo último:</b> solo el campo <code>accion</code> = queda, agenda o deshacer.</li>
 <li>Abajo de todo, fuera del menú: <b>Mostrar resultado</b> con el <b>Resultado del menú</b>. Si lo usás con Siri, te lo lee en voz alta.</li>
 </ol>
+<p class="sem"><b>¿Y si Siri entiende mal?</b> Petaca te repite lo que entendió. Si no es así, elegí <b>Deshacer lo último</b> y lo borra (si todavía no abriste la app; si ya entró, tocá Deshacer en Petaca). Al abrir la app, un monto que parece mal (mucho más grande que lo de siempre, o repetido ese día) te lo pregunto antes de sumarlo. Si preferís confirmar siempre, en Gasto e Ingreso agregá <b>Mostrar alerta</b> ("¿Cargo $… en …?") antes de Obtener contenido de URL: Siri te lo pregunta y respondés sí o cancelar.</p>
 <p class="sem">Tip: duplicá el atajo, dejale solo Dictar texto → Obtener contenido de URL (nota) → Mostrar resultado y llamalo <b>Contale a Petaca</b>: "Oye Siri, contale a Petaca" y hablás directo.</p>
 </details>
 </details></section>

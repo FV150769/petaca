@@ -2156,17 +2156,23 @@ function resumenAtajo(){try{var by={},tot=0,ag={},n=14;
  for(var i=0;i<n;i++){var f=plus(today,i),q=occs(f).slice().sort(porHora);if(q.length)ag[f]=q.slice(0,12).map(function(e){return(e.r?e.r.t+(e.r.t2?"–"+e.r.t2:""):e.t||"")+"|"+(e.r?e.r.x:e.x)})}
  return{t:Date.now(),hoy:today,hasta:plus(today,n-1),cuenta:ACC[0][0],queda:Math.round(diaVal()),ef:Math.round(efVal()),mes:ym,gastado:Math.round(tot),
   cats:Object.keys(BUDGET).filter(function(k){return BUDGET[k]>0&&by[k]}).map(function(k){return[k,Math.round(by[k]),BUDGET[k]]}),ag:ag}}catch(e){return null}}
-// Lo que llegó del atajo: los gastos y los ingresos entran directo (son datos exactos) y las notas van a Contale para confirmarlas.
+// Lo que llegó del atajo: los gastos y los ingresos entran directo y las notas van a Contale para confirmarlas. Si Siri pudo
+// escuchar mal (un monto mucho más grande que lo de siempre, o repetido ese día), pregunta como al cargarlo a mano; si decís
+// que no, queda escrito en Contale para corregirlo. Con la app bloqueada (PIN) espera a que la abras.
 // Lo que se borra de la bandeja es lo que se suma: si dos dispositivos se abren a la vez, cada cosa entra en uno solo.
-async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE)return;ATRAE=true;
+async function atajoTraer(){if(!SB||!UID||!SYNCED||ATRAE||LOCKED)return;ATRAE=true;
  try{var r=await SB.from("atajo_bandeja").delete().gt("id",0).select("id,tipo,datos");
   if(r.error||!r.data||!r.data.length){if(RESHOY!==today)push().catch(function(){});return}
-  var G=[],I=[],N=[],ok=/^\d{4}-\d{2}-\d{2}$/;
+  var G=[],I=[],N=[],ok=/^\d{4}-\d{2}-\d{2}$/,NO="\n\nSi tocás Cancelar, lo dejo escrito en Contale para que lo corrijas.";
+  function cuando(f){return f!==today?" el "+fd(f):""}
   r.data.sort(function(a,b){return a.id-b.id}).forEach(function(x){var d=x.datos||{},f=ok.test(d.f)?d.f:today;
-   if(x.tipo==="gasto"&&d.m>0){var gx=String(d.x||"").trim(),c=BUDGET[d.c]!=null?d.c:gx?pCat(n2(gx)):"Otros";aprender(gx,c);G.push({f:f,m:+d.m,c:c,x:gx,me:d.me==="e"?"e":"t"})}
-   else if(x.tipo==="ingreso"&&d.v>0)I.push(d);
+   if(x.tipo==="gasto"&&d.m>0){var gx=String(d.x||"").trim(),c=BUDGET[d.c]!=null?d.c:gx?pCat(n2(gx)):"Otros",g={f:f,m:+d.m,c:c,x:gx,me:d.me==="e"?"e":"t"};
+    if(!seguro(dudoso("g",g.m,f,c)&&"Del atajo del iPhone: "+dudoso("g",g.m,f,c)+NO)){N.push("gasté "+num(g.m)+" en "+c+(gx?" ("+gx+")":"")+" con "+(g.me==="e"?"efectivo":"transferencia")+cuando(f));return}
+    aprender(gx,c);L.expenses.push(g);G.push(g)}
+   else if(x.tipo==="ingreso"&&d.v>0){
+    if(!seguro(dudoso("i",+d.v,f)&&"Del atajo del iPhone: "+dudoso("i",+d.v,f)+NO)){N.push("me entraron "+num(+d.v)+" por "+(d.me==="e"?"efectivo":"transferencia")+(d.p!=null?" y separo el "+d.p+"% para ahorro":"")+cuando(f));return}
+    I.push(sumarIng(f,+d.v,d.p==null?AHO:d.p,d.me))}
    else if(x.tipo==="nota"&&d.t)N.push(String(d.t).trim())});
-  G.forEach(function(g){L.expenses.push(g)});I.forEach(function(d){sumarIng(ok.test(d.f)?d.f:today,+d.v,d.p==null?AHO:d.p,d.me)});
   if(G.length||I.length){save();render()}
   var q=[];if(G.length)q.push(G.length===1?"un gasto de "+money(G[0].m)+" en "+G[0].c:cant(G.length,"gasto","gastos"));if(I.length)q.push(I.length===1?"un ingreso de "+money(I[0].v):cant(I.length,"ingreso","ingresos"));
   var msg=q.length?"Del atajo del iPhone sumé "+q.join(" y ")+".":"";
@@ -2236,7 +2242,7 @@ function lockMostrar(){var c=lockCfg();if(!c||!UID){lockAbrir();return}LOCKED=tr
  if(LOCKTECLA)document.removeEventListener("keydown",LOCKTECLA);
  LOCKTECLA=function(e){if(!LOCKED)return;if(/^\d$/.test(e.key)){tecla(e.key);e.preventDefault()}else if(e.key==="Backspace"){tecla("<");e.preventDefault()}};
  document.addEventListener("keydown",LOCKTECLA);var f=tec.querySelector("button:not([disabled])");if(f)f.focus({preventScroll:true})}
-function lockAbrir(){LOCKED=false;document.documentElement.classList.remove("bloqueado");var w=$("lock");if(w){w.hidden=true;w.innerHTML=""}if(LOCKTECLA){document.removeEventListener("keydown",LOCKTECLA);LOCKTECLA=null}}
+function lockAbrir(){var era=LOCKED;LOCKED=false;if(era)setTimeout(atajoTraer,0);document.documentElement.classList.remove("bloqueado");var w=$("lock");if(w){w.hidden=true;w.innerHTML=""}if(LOCKTECLA){document.removeEventListener("keydown",LOCKTECLA);LOCKTECLA=null}}
 document.addEventListener("visibilitychange",function(){if(document.hidden){OCULTO=Date.now();return}var c=lockCfg();if(c&&UID&&!LOCKED&&OCULTO&&Date.now()-OCULTO>=(c.min||0)*60000)lockMostrar()});
 $("lockb").onclick=function(){lockMostrar()};
 // Configuración → Pantalla y bloqueo
